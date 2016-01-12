@@ -82,3 +82,6 @@ class CtlChecker:
             if self._lts.graph.node[s]['initial']:
                 return True
         return False
+
+    def sat(self, phi):
+        return (self._sat(phi, [s for s,a in phi.graph.nodes(data=True) if a['root'] ==True][0]))

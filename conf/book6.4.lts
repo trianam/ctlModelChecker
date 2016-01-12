@@ -1,0 +1,11 @@
+s0 true a
+s1 true a,b
+s2 true b
+s3 true a
+
+s0 s1
+s0 s2
+s1 s0
+s1 s3
+s2 s1
+s3 s3

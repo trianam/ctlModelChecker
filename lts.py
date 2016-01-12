@@ -14,10 +14,10 @@ class Lts:
                 continue
 
             if nodesPart:
-                if (fields[1] == 'NULL'):
-                    self.graph.add_node(fields[0], att=[], initial=(fields[2]=='true'))
+                if (len(fields) <= 2):
+                    self.graph.add_node(fields[0], initial=(fields[1]=='true'), att=[])
                 else:
-                    self.graph.add_node(fields[0], att=fields[1].split(',',fields[1].count(',')), initial=(fields[2]=='true'))
+                    self.graph.add_node(fields[0], initial=(fields[1]=='true'), att=fields[2].split(',',fields[2].count(',')))
 
             else:
                 self.graph.add_edge(fields[0], fields[1])
