@@ -93,6 +93,63 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]
+  \frametitle{Formula example}
+  \begin{block}{Formula}
+    \begin{equation*}
+      \Phi=\exists\ctlNext a
+      \land\exists(b\ctlUntil\exists\ctlAlways\neg c)
+    \end{equation*}    
+  \end{block}
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      \vspace{-1cm}
+      \begin{center}
+        \begin{tikzpicture}[scale=0.8, sibling distance=3cm]
+          \node[oval,label={[label distance=-2mm]110:$f_0$}](and) {$\land$} 
+          child{ node[oval,label={[label distance=-1mm]110:$f_1$}] {$\exists\ctlNext$}
+            child { node[oval,label={[label distance=-2mm]110:$f_3$}] {$a$} }
+          }
+          child{ node[oval,label={[label distance=-2mm]80:$f_2$}] {$\exists\ctlUntil$}
+            child { node[oval,label={[label distance=-2mm]110:$f_4$}] {$b$} }
+            child { node[oval,label={[label distance=-2mm]80:$f_5$}] {$\exists\ctlAlways$}
+              child { node[oval,label={[label distance=-2mm]80:$f_6$}] {$\neg$}
+                child { node[oval,label={[label distance=-2mm]80:$f_7$}] {$c$} }
+              }
+            }
+          };
+        \end{tikzpicture}
+      \end{center}      
+    \end{column}
+    \begin{column}{0.2\textwidth}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \lstinputlisting[style=customConf]{../conf/example-6.22.frm}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{fragile}
+  \frametitle{Implementazione \ac{TS}}
+  \begin{center}
+    \begin{tikzpicture}
+      \coordinate(init) at (-1,1);
+      \node(s0) at (0,1) [oval, label={[label distance=-2mm]110:$s_0$}] {$a$};
+      \node(s1) at (3,1) [oval, label={[label distance=-2mm]80:$s_1$}] {$a,b$};
+      \node(s2) at (1.5,-1) [oval, label={[label distance=-2mm]190:$s_2$}] {$b$};
+      \node(s3) at (5.5,1) [oval, label={[label distance=-2mm]110:$s_3$}] {$a$};
+      \draw[arrow] (init) to (s0);
+      \draw[arrow] (s0) to[bend left] (s1);
+      \draw[arrow] (s1) to[bend left] (s0);
+      \draw[arrow] (s0) to (s2);
+      \draw[arrow] (s2) to (s1);
+      \draw[arrow] (s1) to (s3);
+      \draw[arrow] (s3) to[loop right] (s3);
+    \end{tikzpicture}
+  \end{center}
+  \lstinputlisting[style=customConf]{../conf/book6.4.ts}
+\end{frame}
+
 \begin{frame}
   \frametitle{\acs{CTL} Model Checking}
   \begin{itemize}
@@ -118,6 +175,33 @@
     \item $TS\models\Phi \Leftrightarrow I\subseteq Sat(\Phi)$
     \end{itemize}
   \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementazione $Sat(\cdot)$}
+  \begin{pblock}
+def __init__(self, ts):
+    self._callDic = {
+        'true':self._satTrue,
+        'ap':self._satAp,
+        'and':self._satAnd,
+        'not':self._satNot,
+        'next':self._satNext,
+        'until':self._satUntil,
+        'always':self._satAlways,
+    }
+
+    self._ts = ts
+  \end{pblock}
+  \begin{pblock}
+def sat(self, phi):
+    return (self._sat(phi, [s for s,a in phi.graph.nodes(data=True) if a['root'] ==True][0]))    
+  \end{pblock}
+  \begin{pblock}
+def _sat(self, phi, nodo):
+    if (phi.graph.node[nodo]['form'] in self._callDic.keys()) :
+        return self._callDic[phi.graph.node[nodo]['form']](phi, nodo)    
+  \end{pblock}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -149,6 +233,7 @@ def _satNot(self, phi, nodo):
 \end{frame}
 
 \begin{frame}[fragile]
+  \frametitle{Implementazione $Sat(\cdot)$}
   \begin{pblock}
 def _satNext(self, phi, nodo):
     retSet = set()
@@ -177,6 +262,7 @@ def _satUntil(self, phi, nodo):
 \end{frame}
 
 \begin{frame}[fragile]
+  \frametitle{Implementazione $Sat(\cdot)$}
   \begin{pblock}
 def _satAlways(self, phi, nodo):
     T = self._sat(phi, phi.graph.successors(nodo)[0])
@@ -195,6 +281,16 @@ def _satAlways(self, phi, nodo):
                     E.add(s)
 
     return 
+  \end{pblock}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementazione $TS\models\Phi$}
+  \begin{pblock}
+def check(self, phi):
+    sats = self._sat(phi, [s for s,a in phi.graph.nodes(data=True) if a['root'] ==True][0])
+    initials = set([s for s,a in self._ts.graph.nodes(data=True) if a['initial'] ==True])
+    return initials.issubset(sats)    
   \end{pblock}
 \end{frame}
 

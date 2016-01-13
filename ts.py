@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 
-class Lts:
+class Ts:
     def __init__(self, filename):
         self.graph = nx.DiGraph()
         

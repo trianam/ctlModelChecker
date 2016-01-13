@@ -1,7 +1,7 @@
 #import networkx as nx
 
 class CtlChecker:
-    def __init__(self, lts):
+    def __init__(self, ts):
         self._callDic = {
             'true':self._satTrue,
             'ap':self._satAp,
@@ -12,14 +12,14 @@ class CtlChecker:
             'always':self._satAlways,
         }
 
-        self._lts = lts
+        self._ts = ts
         
     def _satTrue(self, phi, nodo):
-        return set(self._lts.graph.nodes())
+        return set(self._ts.graph.nodes())
 
     def _satAp(self, phi, nodo):
         retSet = set()
-        for stato,att in self._lts.graph.nodes(data=True):
+        for stato,att in self._ts.graph.nodes(data=True):
             if phi.graph.node[nodo]['val'] in att['att']:
                retSet.add(stato)
 
@@ -29,14 +29,14 @@ class CtlChecker:
         return self._sat(phi, phi.graph.successors(nodo)[0]).intersection(self._sat(phi, phi.graph.successors(nodo)[1]))
 
     def _satNot(self, phi, nodo):
-        return set(self._lts.graph.nodes()).difference(self._sat(phi, phi.graph.successors(nodo)[0]))
+        return set(self._ts.graph.nodes()).difference(self._sat(phi, phi.graph.successors(nodo)[0]))
 
     def _satNext(self, phi, nodo):
         retSet = set()
         satPhi = self._sat(phi, phi.graph.successors(nodo)[0])
 
-        for stato in self._lts.graph.nodes():
-            if set(self._lts.graph.successors(stato)).intersection(satPhi): #true if not empty
+        for stato in self._ts.graph.nodes():
+            if set(self._ts.graph.successors(stato)).intersection(satPhi): #true if not empty
                 retSet.add(stato)
 
         return retSet
@@ -47,7 +47,7 @@ class CtlChecker:
 
         while E: #while not empty
             r = E.pop()
-            for s in self._lts.graph.predecessors(r):
+            for s in self._ts.graph.predecessors(r):
                 if s in self._sat(phi, phi.graph.successors(nodo)[0]).difference(T):
                     E.add(s)
                     T.add(s)
@@ -56,14 +56,14 @@ class CtlChecker:
 
     def _satAlways(self, phi, nodo):
         T = self._sat(phi, phi.graph.successors(nodo)[0])
-        E = set(self._lts.graph.nodes()).difference(T)
+        E = set(self._ts.graph.nodes()).difference(T)
         count = dict()
         for s in T:
-            count[s] = len(self._lts.graph.successors(s))
+            count[s] = len(self._ts.graph.successors(s))
 
         while E:
             r = E.pop()
-            for s in self._lts.graph.predecessors(r):
+            for s in self._ts.graph.predecessors(r):
                 if s in T:
                     count[s] = count[s]-1
                     if count[s] == 0:
@@ -78,7 +78,7 @@ class CtlChecker:
 
     def check(self, phi):
         sats = self._sat(phi, [s for s,a in phi.graph.nodes(data=True) if a['root'] ==True][0])
-        initials = set([s for s,a in self._lts.graph.nodes(data=True) if a['initial'] ==True])
+        initials = set([s for s,a in self._ts.graph.nodes(data=True) if a['initial'] ==True])
         return initials.issubset(sats)
 
     def sat(self, phi):

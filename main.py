@@ -1,32 +1,37 @@
 #!/usr/bin/python
 
-import lts
+import ts
 import formule
 import ctlChecker
 
 print('============== Test')
-lts1 = lts.Lts('conf/lts1.conf')
+ts1 = ts.Ts('conf/ts1.conf')
 form1 = formule.Formule('conf/form1.conf')
-checker = ctlChecker.CtlChecker(lts1)
+form2 = formule.Formule('conf/example-6.22.frm')
+checker = ctlChecker.CtlChecker(ts1)
+print('---a')
 print(checker.check(form1))
 print(checker.sat(form1))
+print('---b')
+print(checker.check(form2))
+print(checker.sat(form2))
 
 print('============== Oven')
-ltsOven = lts.Lts('conf/oven.cfg')
+tsOven = ts.Ts('conf/oven.cfg')
 formOven = formule.Formule('conf/formOven1.cfg')
-checkOven = ctlChecker.CtlChecker(ltsOven)
+checkOven = ctlChecker.CtlChecker(tsOven)
 print(checkOven.sat(formOven))
 
 print('============= Morgagni')
-ltsMorgagni = lts.Lts('conf/ltsMorgagni.cfg')
+tsMorgagni = ts.Ts('conf/tsMorgagni.cfg')
 forMorgagni = formule.Formule('conf/forMorgagni.cfg')
-checkMorgagni = ctlChecker.CtlChecker(ltsMorgagni)
+checkMorgagni = ctlChecker.CtlChecker(tsMorgagni)
 print(checkMorgagni.check(forMorgagni))
 
 
 print('============== BOOK 6.4')
-ltsBook6_4 = lts.Lts('conf/book6.4.lts')
-checkBook6_4 = ctlChecker.CtlChecker(ltsBook6_4)
+tsBook6_4 = ts.Ts('conf/book6.4.ts')
+checkBook6_4 = ctlChecker.CtlChecker(tsBook6_4)
 
 forBook6_4_1 = formule.Formule('conf/book6.4-1.frm')
 forBook6_4_2 = formule.Formule('conf/book6.4-2.frm')

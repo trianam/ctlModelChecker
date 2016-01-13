@@ -37,14 +37,6 @@
 \def\transW{8mm}
 \def\transH{2mm}
 
-\tikzstyle{obstacle}=[fill=green, draw=black]
-\tikzstyle{convexHull}=[fill=blue!30]
-\tikzstyle{convexHullBord}=[color=black, dash pattern=on 3pt off 3pt]
-\tikzstyle{controlPoly}=[color=black, line width=0.25mm]
-\tikzstyle{spline}=[color=red, line width=0.5mm]
-\tikzstyle{controlVert}=[color=green, draw=black]
-\tikzstyle{textArrow}=[draw=red, line width=0.5mm, ->]
-
 \colorlet{mmcb}{black!70}
 \colorlet{mmc1}{red!80}
 \colorlet{mmc2}{blue!80}
@@ -87,6 +79,26 @@ shadow, minimum width=\transH, minimum height=\transW]
 \tikzstyle{preN}=[<-, very thick, >=o, draw=drawColor]
 \tikzstyle{post}=[->, very thick, >=stealth', draw=drawColor]
 \tikzstyle{highlight}=[draw=red]
+
+\lstdefinestyle{customConf}{
+   basicstyle=\scriptsize\ttfamily,
+   breaklines=true, breakatwhitespace=true,
+   postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{red}\hookrightarrow\space}},
+   frameround=fttt,
+   frame=trBL,
+   backgroundcolor=\color{yellow!20},
+   numbers=left,
+   stepnumber=1,    
+   firstnumber=1,
+   numberfirstline=true,
+   numberstyle=\tiny\color{black!50},
+   xleftmargin=1.75em,
+   framexleftmargin=2.1em,
+   % rulesepcolor=\color{gray},
+   rulecolor=\color{black}
+   % linewidth=8cm,
+}
+
 \lstdefinestyle{customPython}{
    language=Python,
    % basicstyle=\small\ttfamily\bfseries,
@@ -142,7 +154,7 @@ shadow, minimum width=\transH, minimum height=\transW]
 %}
 
 \graphicspath{{img/}}
-\lstset{inputpath=../cSrc/}
+%\lstset{inputpath=../cSrc/}
 
 \definecolor{links}{HTML}{2A1B81}
 \hypersetup{colorlinks,linkcolor=links,urlcolor=links}
