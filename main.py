@@ -28,6 +28,12 @@ forMorgagni = formule.Formule('conf/forMorgagni.cfg')
 checkMorgagni = ctlChecker.CtlChecker(tsMorgagni)
 print(checkMorgagni.check(forMorgagni))
 
+print('============= Morgagni2')
+tsMorgagni2 = ts.Ts('conf/morgagni2.ts')
+forMorgagni2 = formule.Formule('conf/morgagni2-1.frm')
+checkMorgagni2 = ctlChecker.CtlChecker(tsMorgagni2)
+print(checkMorgagni2.check(forMorgagni2))
+
 
 print('============== BOOK 6.4')
 tsBook6_4 = ts.Ts('conf/book6.4.ts')

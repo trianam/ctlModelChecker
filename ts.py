@@ -8,7 +8,7 @@ class Ts:
         f = open(filename, 'r')
         nodesPart = True
         for line in f:
-            fields = line.split()
+            fields = line.split('//')[0].split()
             if nodesPart and len(fields) == 0:
                 nodesPart = False
                 continue

@@ -9,7 +9,7 @@ class Formule:
         nodesPart = True
         firstLine = True
         for line in f:
-            fields = line.split()
+            fields = line.split('//')[0].split()
             if nodesPart and len(fields) == 0:
                 nodesPart = False
                 continue
