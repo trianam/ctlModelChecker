@@ -1,0 +1,201 @@
+%This work is licensed under the Creative Commons
+%Attribution-ShareAlike 4.0 International License. To view a copy of
+%this license, visit http://creativecommons.org/licenses/by-sa/4.0/ or
+%send a letter to Creative Commons, PO Box 1866, Mountain View, CA
+%94042, USA.
+
+\input{header}
+
+
+\begin{document}
+
+\title[CTL model check]{\textbf{CTL Model Check}}
+\date[\today]{\flushright \today}
+\subtitle{Esame di Metodi Formali per la Verifica di Sistemi}
+\institute[Uni. Firenze]{
+  \includegraphics[width=5cm]{img/logoUnifiName.eps}
+}
+
+\author[Buracchi M. - Martina S.]{
+  \begin{center}
+    \begin{tabular}{lr}
+      Marco Buracchi & Stefano \textsc{Martina}\\
+      \href{mailto:marco.buracchi1@stud.unifi.it}{marco.buracchi1@stud.unifi.it}&
+      \href{mailto:stefano.martina@stud.unifi.it}{stefano.martina@stud.unifi.it}\\
+    \end{tabular}
+  \end{center}
+}
+
+\titlegraphic{
+  \vspace{-0.5cm}
+  \tiny
+  \href{http://creativecommons.org/licenses/by-sa/4.0/}{\includegraphics[width=1cm]{img/logoCC.png}}
+  This work is licensed under a
+  \href{http://creativecommons.org/licenses/by-sa/4.0/}{Creative
+    Commons Attribution-ShareAlike 4.0 International License}.
+}
+
+\newacro{CTL}{Computation Tree Logic}
+\newacro{ENF}{Existential Normal Form}
+\newacro{TS}{Transition System}
+\newacro{LTS}{Labelled Transition System}
+
+%\acrodefplural{VD}[VDs]{Voronoi Diagrams}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\section{Introduzione}
+\begin{frame}
+  \frametitle{\ac{CTL}}
+  \begin{block}{Grammatica}
+   \begin{eqnarray*}
+     \Phi &::=& true|a|\Phi_1\land
+     \Phi_2|\neg\Phi|\exists\varphi|\forall\varphi\\
+     \varphi &::=& \ctlNext\Phi|\Phi_1\ctlUntil\Phi_2
+   \end{eqnarray*}
+  \end{block}
+  \begin{itemize}
+  \item $\Phi$ sono state formula
+  \item $\varphi$ sono path formula
+  \end{itemize}
+  \begin{block}{Operatori derivati}
+    \begin{eqnarray*}
+      \exists\ctlEventually\Phi &=& \exists(true\ctlUntil\Phi)\\
+      \forall\ctlEventually\Phi &=& \forall(true\ctlUntil\Phi)\\
+      \exists\ctlAlways\Phi &=& \neg\forall\ctlEventually\neg\Phi\\
+      \forall\ctlAlways\Phi &=& \neg\exists\ctlEventually\neg\Phi
+    \end{eqnarray*}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\ac{CTL} \ac{ENF}}
+  \begin{block}{Grammatica}
+   \begin{eqnarray*}
+     \Phi &::=& true|a|\Phi_1\land
+     \Phi_2|\neg\Phi|\exists\ctlNext\Phi|\exists(\Phi_1\ctlUntil\Phi_2)|
+     \exists\ctlAlways\Phi
+   \end{eqnarray*}
+  \end{block}
+  \begin{block}{Leggi}
+    \begin{eqnarray*}
+      \forall\ctlNext\Phi&\equiv&\neg\exists\ctlNext\neg\Phi\\
+      \forall(\Phi\ctlUntil\Psi)&\equiv&\neg\exists(\neg\Psi\ctlUntil(\neg\Phi\land\neg\Psi))\land\neg\exists\ctlAlways\neg\Psi\\
+      \forall\ctlEventually\Phi&\equiv&\neg\exists\ctlAlways\neg\Phi\\
+      \forall\ctlAlways\Phi&\equiv&\neg\exists\ctlEventually\neg\Phi=\neg\exists(true\ctlUntil\Phi)
+    \end{eqnarray*}
+  \end{block}
+  \begin{itemize}
+  \item $\forall(\Phi\ctlUntil\Psi)$ comporta esplosione esponenziale
+    della formula
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\acs{CTL} Model Checking}
+  \begin{itemize}
+  \item \alert{Verificare} se $TS\models\Phi$
+    \begin{itemize}
+    \item \alert{calcolare} ricorsivamente $Sat(\Phi)$
+      \begin{eqnarray*}
+        Sat(true)&=&S\\
+        Sat(a)&=&\left\{s\in S| a\in L(s)\right\}\qquad,\forall a\in
+        AP\\
+        Sat(\Phi\land\Psi)&=&Sat(\Phi)\cap Sat(\Psi)\\
+        Sat(\neg\Phi)&=&S\setminus Sat(\Phi)\\
+        Sat(\exists\ctlNext\Phi)&=&\left\{s\in S|Post(s)\cap Sat(\Phi)\neq\varnothing\right\}\\
+        Sat(\exists(\Phi\ctlUntil\Psi))&=&\text{il pi\`u piccolo }T\subseteq
+        S\text{ t.c.}\\
+        &&\quad Sat(\Psi)\cup\left\{s\in Sat(\Phi)|Post(s)\cap
+          T\neq\varnothing\right\}\subseteq T\\
+        Sat(\exists\ctlAlways\Phi)&=&\text{il pi\`u grande }T\subseteq
+        S\text{ t.c.}\\
+        &&\quad T\subseteq\left\{s\in Sat(\Phi)|Post(s)\cap
+          T\neq\varnothing\right\}
+      \end{eqnarray*}
+    \item $TS\models\Phi \Leftrightarrow I\subseteq Sat(\Phi)$
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementazione $Sat(\cdot)$}
+  \begin{pblock}
+def _satTrue(self, phi, nodo):
+    return set(self._lts.graph.nodes())
+  \end{pblock}
+
+  \begin{pblock}
+def _satAp(self, phi, nodo):
+    retSet = set()
+    for stato,att in self._lts.graph.nodes(data=True):
+        if phi.graph.node[nodo]['val'] in att['att']:
+           retSet.add(stato)
+
+    return retSet    
+  \end{pblock}
+
+  \begin{pblock}
+def _satAnd(self, phi, nodo):
+    return self._sat(phi, phi.graph.successors(nodo)[0]).intersection(self._sat(phi, phi.graph.successors(nodo)[1]))
+  \end{pblock}
+
+  \begin{pblock}
+def _satNot(self, phi, nodo):
+    return set(self._lts.graph.nodes()).difference(self._sat(phi, phi.graph.successors(nodo)[0]))
+  \end{pblock}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{pblock}
+def _satNext(self, phi, nodo):
+    retSet = set()
+    satPhi = self._sat(phi, phi.graph.successors(nodo)[0])
+
+    for stato in self._lts.graph.nodes():
+        if set(self._lts.graph.successors(stato)).intersection(satPhi): #true if not empty
+            retSet.add(stato)
+
+    return retSet
+  \end{pblock}
+
+  \begin{pblock}
+def _satUntil(self, phi, nodo):
+    E = self._sat(phi, phi.graph.successors(nodo)[1])
+    T = E.copy()
+
+    while E: #while not empty
+        r = E.pop()
+        for s in self._lts.graph.predecessors(r):
+            if s in self._sat(phi, phi.graph.successors(nodo)[0]).difference(T):
+                E.add(s)
+                T.add(s)
+    return T
+  \end{pblock}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{pblock}
+def _satAlways(self, phi, nodo):
+    T = self._sat(phi, phi.graph.successors(nodo)[0])
+    E = set(self._lts.graph.nodes()).difference(T)
+    count = dict()
+    for s in T:
+        count[s] = len(self._lts.graph.successors(s))
+
+    while E:
+        r = E.pop()
+        for s in self._lts.graph.predecessors(r):
+            if s in T:
+                count[s] = count[s]-1
+                if count[s] == 0:
+                    T.remove(s)
+                    E.add(s)
+
+    return 
+  \end{pblock}
+\end{frame}
+
+\end{document}
