@@ -4,19 +4,20 @@ import lts
 import formule
 import ctlChecker
 
+print('============== Test')
 lts1 = lts.Lts('conf/lts1.conf')
 form1 = formule.Formule('conf/form1.conf')
 checker = ctlChecker.CtlChecker(lts1)
 print(checker.check(form1))
 print(checker.sat(form1))
 
-print('==============')
+print('============== Oven')
 ltsOven = lts.Lts('conf/oven.cfg')
 formOven = formule.Formule('conf/formOven1.cfg')
 checkOven = ctlChecker.CtlChecker(ltsOven)
 print(checkOven.sat(formOven))
 
-print('=============')
+print('============= Morgagni')
 ltsMorgagni = lts.Lts('conf/ltsMorgagni.cfg')
 forMorgagni = formule.Formule('conf/forMorgagni.cfg')
 checkMorgagni = ctlChecker.CtlChecker(ltsMorgagni)

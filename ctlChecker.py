@@ -78,10 +78,8 @@ class CtlChecker:
 
     def check(self, phi):
         sats = self._sat(phi, [s for s,a in phi.graph.nodes(data=True) if a['root'] ==True][0])
-        for s in sats:
-            if self._lts.graph.node[s]['initial']:
-                return True
-        return False
+        initials = set([s for s,a in self._lts.graph.nodes(data=True) if a['initial'] ==True])
+        return initials.issubset(sats)
 
     def sat(self, phi):
         return (self._sat(phi, [s for s,a in phi.graph.nodes(data=True) if a['root'] ==True][0]))
