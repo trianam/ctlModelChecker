@@ -84,12 +84,13 @@
       \forall\ctlNext\Phi&\equiv&\neg\exists\ctlNext\neg\Phi\\
       \forall(\Phi\ctlUntil\Psi)&\equiv&\neg\exists(\neg\Psi\ctlUntil(\neg\Phi\land\neg\Psi))\land\neg\exists\ctlAlways\neg\Psi\\
       \forall\ctlEventually\Phi&\equiv&\neg\exists\ctlAlways\neg\Phi\\
-      \forall\ctlAlways\Phi&\equiv&\neg\exists\ctlEventually\neg\Phi=\neg\exists(true\ctlUntil\Phi)
+      \forall\ctlAlways\Phi&\equiv&\neg\exists\ctlEventually\neg\Phi=\neg\exists(true\ctlUntil\neg\Phi)
     \end{eqnarray*}
   \end{block}
   \begin{itemize}
   \item $\forall(\Phi\ctlUntil\Psi)$ comporta esplosione esponenziale
     della formula
+  \item utile anche la formula vista prima: $\exists\ctlEventually\Phi = \exists(true\ctlUntil\Phi)$
   \end{itemize}
 \end{frame}
 

@@ -20,8 +20,8 @@ f17 ap b
 f0 f1
 f0 f2
 f1 f3
-f3 f5
-f3 f6
+f3 f5 sx
+f3 f6 dx
 f5 f8
 f5 f9
 f9 f14
