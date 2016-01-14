@@ -7,9 +7,9 @@ class CtlChecker:
             'ap':self._satAp,
             'and':self._satAnd,
             'not':self._satNot,
-            'next':self._satNext,
-            'until':self._satUntil,
-            'always':self._satAlways,
+            'existsNext':self._satNext,
+            'existsUntil':self._satUntil,
+            'existsAlways':self._satAlways,
         }
 
         self._ts = ts

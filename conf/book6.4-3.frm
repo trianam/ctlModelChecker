@@ -1,6 +1,6 @@
-f0 until
+f0 existsUntil
 f1 true
-f2 always
+f2 existsAlways
 f3 ap a
 
 f0 f1

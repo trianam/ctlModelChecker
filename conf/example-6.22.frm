@@ -1,9 +1,9 @@
 f0 and
-f1 next
-f2 until
+f1 existsNext
+f2 existsUntil
 f3 ap a
 f4 ap b
-f5 always
+f5 existsAlways
 f6 not
 f7 ap c
 

@@ -1,8 +1,8 @@
 f0 and
 f1 not
 f2 not
-f3 until
-f4 always
+f3 existsUntil
+f4 existsAlways
 f5 and
 f6 and
 f7 and

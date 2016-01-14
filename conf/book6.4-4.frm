@@ -1,5 +1,5 @@
 f0 not
-f1 next
+f1 existsNext
 f2 not
 f3 ap a
 
