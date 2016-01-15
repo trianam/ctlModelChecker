@@ -293,6 +293,47 @@ def check(self, phi):
     initials = set([s for s,a in self._ts.graph.nodes(data=True) if a['initial'] ==True])
     return initials.issubset(sats)    
   \end{pblock}
+  \begin{center}
+    Ma non finisce qui \dots    
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Formule generiche}
+  \begin{itemize}
+  \item Alberi di \alert{conversione} generici
+    \begin{itemize}
+    \item Foglie speciali per agganciarci alla formula originale
+    \end{itemize}
+  \end{itemize}
+  \begin{center}
+    \begin{tikzpicture}
+      \node(f0) at (0,2) [oval, label={[label distance=-1mm]110:$f_0$}] {$\exists\ctlEventually$};
+      \node(f1) at (0,0) [oval, label={[label distance=-1mm]110:$f_1$}] {$\Phi_o$};
+
+      \node(ff0) at (4,2) [oval, label={[label distance=-1mm]110:$f_0$}] {$\exists\ctlUntil$};
+      \node(ff1) at (3,0) [oval, label={[label distance=-1mm]110:$f_1$}] {$true$};
+      \node(ff2) at (5,0) [oval, label={[label distance=-1mm]80:$f_2$}] {$\Phi_c$};
+      \draw[bigArrow] (1,1) to (2,1);
+      \draw[arrow] (f0) to (f1);
+      \draw[arrow] (ff0) to (ff1);
+      \draw[arrow] (ff0) to (ff2);
+    \end{tikzpicture}
+  \end{center}
+  \begin{enumerate}
+  \item \alert{Calcolo} di $Sat(\Phi_o)$
+  \item \alert{Salva} risultato in nodo speciale $\Phi_c$
+  \item \alert{Calcolo} di $Sat(\exists\ctlUntil)$ su albero di conversione
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}
+  \begin{center}
+	\textbf{\calligra\Huge The End.}\\
+  \includegraphics[width=5cm]{img/ornament.eps}\\[1cm]
+	\pause
+	{\huge\calligra Questions?\pause{} Thank you!}
+  \end{center}
 \end{frame}
 
 \end{document}
