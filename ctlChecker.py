@@ -1,4 +1,4 @@
-import networkx as nx
+import conversionFactory as cf
 
 class CtlChecker:
     def __init__(self, ts):
@@ -6,247 +6,35 @@ class CtlChecker:
             'true':self._satTrue,
             'ap':self._satAp,
             'and':self._satAnd,
-            'or':self._satOr,
+            'or':self._satConversionTwoSons,
             'not':self._satNot,
+            'implies':self._satConversionTwoSonsOrdered,
             'existsNext':self._satExNext,
             'existsUntil':self._satExUntil,
             'existsAlways':self._satExAlways,
-            'existsEventually':self._satExEventually,
-            'forallNext':self._satFaNext,
-            'forallUntil':self._satFaUntil,
-            'forallAlways':self._satFaAlways,
-            'forallEventually':self._satFaEventually,
+            'existsEventually':self._satConversionOneSon,
+            'forallNext':self._satConversionOneSon,
+            'forallUntil':self._satConversionTwoSonsOrdered,
+            'forallAlways':self._satConversionOneSon,
+            'forallEventually':self._satConversionOneSon,
             'phi':self._satPhi,
         }
 
         self._ts = ts
 
-        self._orTree, self._orRoot, self._orPhi, self._orPsi = self._createOrTree()
-        self._exEventuallyTree, self._exEventuallyRoot, self._exEventuallyPhi = self._createExEventuallyTree()
-        self._faNextTree, self._faNextRoot, self._faNextPhi = self._createFaNextTree()
-        self._faUntilTree, self._faUntilRoot, self._faUntilPhi, self._faUntilPsi = self._createFaUntilTree()
-        self._faAlwaysTree, self._faAlwaysRoot, self._faAlwaysPhi = self._createFaAlwaysTree()
-        self._faEventuallyTree, self._faEventuallyRoot, self._faEventuallyPhi = self._createFaEventuallyTree()
-
-    def _createOrTree(self):
-        tree = nx.DiGraph()
-
-        #de morgan
+        factory = cf.ConversionFactory()
+        self._convTree = dict()
+        self._convRoot = dict()
+        self._convPhi = dict()
+        self._convPsi = dict()
         
-        #add left not
-        nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form='not')
-
-        #add and
-        nodeAnd = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd, form='and')
-
-        #add left not
-        nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form='not')
-
-        #add right not
-        nodeNot3 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot3, form='not')
-
-        #add phi
-        nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form='phi', sat=set())
-        
-        #add psi
-        nodePsi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePsi, form='phi', sat=set())
-
-        tree.add_edge(nodeNot1, nodeAnd)
-        tree.add_edge(nodeAnd, nodeNot2)
-        tree.add_edge(nodeAnd, nodeNot3)
-        tree.add_edge(nodeNot2, nodePhi)
-        tree.add_edge(nodeNot3, nodePsi)
-                
-        return (tree, nodeNot1, nodePhi, nodePsi)
-
-        
-    def _createExEventuallyTree(self):
-        tree = nx.DiGraph()
-
-        #add exists true until phi
-
-        #add exists until
-        nodeUntil = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeUntil, form='existsUntil')
-
-        #add true
-        nodeTrue = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeTrue, form='true')
-
-        #add phi
-        nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form='phi', sat=set())
-
-        tree.add_edge(nodeUntil, nodeTrue, son='sx')
-        tree.add_edge(nodeUntil, nodePhi, son='dx')
-
-        return (tree, nodeUntil, nodePhi)
-
-    def _createFaNextTree(self):
-        tree = nx.DiGraph()
-
-        #add not Exists next not phi
-
-        #add outer not
-        nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form='not')
-
-        #add exist next
-        nodeNext = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNext, form='existsNext')
-
-        #add inner not
-        nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form='not')
-
-        #add phi
-        nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form='phi', sat=set())
-
-        tree.add_edge(nodeNot1, nodeNext)
-        tree.add_edge(nodeNext, nodeNot2)
-        tree.add_edge(nodeNot2, nodePhi)
-        
-        return (tree, nodeNot1, nodePhi)
-
-    def _createFaUntilTree(self):
-        tree = nx.DiGraph()
-
-        #add a lot of states
-
-        #add and
-        nodeAnd1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd1, form='and')
-
-        #add left not
-        nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form='not')
-
-        #add right not
-        nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form='not')
-
-        #add exists until
-        nodeUntil = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeUntil, form='existsUntil')
-
-        #add exists always
-        nodeAlways = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAlways, form='existsAlways')
-
-        #add another not
-        nodeNot3 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot3, form='not')
-
-        #add another and
-        nodeAnd2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd2, form='and')
-
-        #add one more not
-        nodeNot4 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot4, form='not')
-
-        #add even more nots
-        nodeNot5 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot5, form='not')
-
-        #add too much nots
-        nodeNot6 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot6, form='not')
-
-        #add phi
-        nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form='phi', sat=set())
-        
-        #add psi
-        nodePsi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePsi, form='phi', sat=set())
-
-        tree.add_edge(nodeAnd1, nodeNot1)
-        tree.add_edge(nodeAnd1, nodeNot2)
-        tree.add_edge(nodeNot1, nodeUntil)
-        tree.add_edge(nodeNot2, nodeAlways)
-        tree.add_edge(nodeUntil, nodeNot3, son='sx')
-        tree.add_edge(nodeUntil, nodeAnd2, son='dx')
-        tree.add_edge(nodeAlways, nodeNot4)
-        tree.add_edge(nodeAnd2, nodeNot5)
-        tree.add_edge(nodeAnd2, nodeNot6)
-        tree.add_edge(nodeNot3, nodePsi)
-        tree.add_edge(nodeNot5, nodePhi)
-        tree.add_edge(nodeNot6, nodePsi)
-        tree.add_edge(nodeNot4, nodePsi)
-                
-        return (tree, nodeAnd1, nodePhi, nodePsi)
-    
-    def _createFaAlwaysTree(self):
-        tree = nx.DiGraph()
-
-        #add not exists true until not phi
-
-        #add outer not
-        nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form='not')
-
-        #add exists until
-        nodeUntil = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeUntil, form='existsUntil')
-
-        #add true
-        nodeTrue = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeTrue, form='true')
-
-        #add inner not
-        nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form='not')
-
-        #add phi
-        nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form='phi', sat=set())
-        
-        tree.add_edge(nodeNot1, nodeUntil)
-        tree.add_edge(nodeUntil, nodeTrue, son='sx')
-        tree.add_edge(nodeUntil, nodeNot2, son='dx')
-        tree.add_edge(nodeNot2, nodePhi)
-
-        return (tree, nodeNot1, nodePhi)
-
-    def _createFaEventuallyTree(self):
-        tree = nx.DiGraph()
-
-        #add not Exists always not phi
-
-        #add outer not
-        nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form='not')
-
-        #add exists always
-        nodeAlways = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAlways, form='existsAlways')
-
-        #add inner not
-        nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form='not')
-
-        #add phi
-        nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form='phi', sat=set())
-        
-        tree.add_edge(nodeNot1, nodeAlways)
-        tree.add_edge(nodeAlways, nodeNot2)
-        tree.add_edge(nodeNot2, nodePhi)
-
-        return (tree, nodeNot1, nodePhi)
-
-
-    
-    # def _subTree(self, tree, newRoot):
-    #     return nx.algorithms.traversal.depth_first_search.dfs_tree(tree, newRoot)
+        self._convTree['implies'], self._convRoot['implies'], self._convPhi['implies'], self._convPsi['implies'] = factory.createImpliesTree()
+        self._convTree['or'], self._convRoot['or'], self._convPhi['or'], self._convPsi['or'] = factory.createOrTree()
+        self._convTree['existsEventually'], self._convRoot['existsEventually'], self._convPhi['existsEventually'] = factory.createExEventuallyTree()
+        self._convTree['forallNext'], self._convRoot['forallNext'], self._convPhi['forallNext'] = factory.createFaNextTree()
+        self._convTree['forallUntil'], self._convRoot['forallUntil'], self._convPhi['forallUntil'], self._convPsi['forallUntil'] = factory.createFaUntilTree()
+        self._convTree['forallAlways'], self._convRoot['forallAlways'], self._convPhi['forallAlways'] = factory.createFaAlwaysTree()
+        self._convTree['forallEventually'], self._convRoot['forallEventually'], self._convPhi['forallEventually'] = factory.createFaEventuallyTree()
         
     def _satTrue(self, tree, root):
         return set(self._ts.graph.nodes())
@@ -312,35 +100,29 @@ class CtlChecker:
 
         return T
 
-    def _satOr(self, tree, root):
+    def _satConversionOneSon(self, tree, root):
+        form = tree.node[root]['form']
+        son = tree.successors(root)[0]
+        
+        self._convTree[form].node[self._convPhi[form]]['sat'] = self._sat(tree, son)
+        return self._sat(self._convTree[form], self._convRoot[form])
+
+    def _satConversionTwoSons(self, tree, root):
+        form = tree.node[root]['form']
         leftSon = tree.successors(root)[0]
         rightSon = tree.successors(root)[1]
-        self._orTree.node[self._orPhi]['sat'] = self._sat(tree, leftSon)
-        self._orTree.node[self._orPsi]['sat'] = self._sat(tree, rightSon)
-        return self._sat(self._orTree, self._orRoot)
-    
-    def _satExEventually(self, tree, root):
-        self._exEventuallyTree.node[self._exEventuallyPhi]['sat'] = self._sat(tree, tree.successors(root)[0])
-        return self._sat(self._exEventuallyTree, self._exEventuallyRoot)
-    
-    def _satFaNext(self, tree, root):
-        self._faNextTree.node[self._faNextPhi]['sat'] = self._sat(tree, tree.successors(root)[0])
-        return self._sat(self._faNextTree, self._faNextRoot)
+        
+        self._convTree[form].node[self._convPhi[form]]['sat'] = self._sat(tree, leftSon)
+        self._convTree[form].node[self._convPsi[form]]['sat'] = self._sat(tree, rightSon)
+        return self._sat(self._convTree[form], self._convRoot[form])
 
-    def _satFaUntil(self, tree, root):
+    def _satConversionTwoSonsOrdered(self, tree, root):
         leftSon = [x for x in tree[root] if tree[root][x]['son'] == 'sx'][0]
         rightSon = [x for x in tree[root] if tree[root][x]['son'] == 'dx'][0]
-        self._faUntilTree.node[self._faUntilPhi]['sat'] = self._sat(tree, leftSon)
-        self._faUntilTree.node[self._faUntilPsi]['sat'] = self._sat(tree, rightSon)
-        return self._sat(self._faUntilTree, self._faUntilRoot)
-
-    def _satFaAlways(self, tree, root):
-        self._faAlwaysTree.node[self._faAlwaysPhi]['sat'] = self._sat(tree, tree.successors(root)[0])
-        return self._sat(self._faAlwaysTree, self._faAlwaysRoot)
-
-    def _satFaEventually(self, tree, root):
-        self._faEventuallyTree.node[self._faEventuallyPhi]['sat'] = self._sat(tree, tree.successors(root)[0])
-        return self._sat(self._faEventuallyTree, self._faEventuallyRoot)
+        form = tree.node[root]['form']
+        self._convTree[form].node[self._convPhi[form]]['sat'] = self._sat(tree, leftSon)
+        self._convTree[form].node[self._convPsi[form]]['sat'] = self._sat(tree, rightSon)
+        return self._sat(self._convTree[form], self._convRoot[form])
 
     def _satPhi(self, tree, root):
         return tree.node[root]['sat']

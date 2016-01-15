@@ -34,9 +34,17 @@ print(checkMorgagni.check(forMorgagni))
 
 print('============= Morgagni2')
 tsMorgagni2 = ts.Ts('conf/morgagni2.ts')
-forMorgagni2 = formule.Formule('conf/morgagni2-1.frm')
 checkMorgagni2 = ctlChecker.CtlChecker(tsMorgagni2)
-print(checkMorgagni2.check(forMorgagni2))
+
+forMorgagni2_1 = formule.Formule('conf/morgagni2-1.frm')
+forMorgagni2_2 = formule.Formule('conf/morgagni2-2.frm')
+forMorgagni2_3 = formule.Formule('conf/morgagni2-3.frm')
+forMorgagni2_4 = formule.Formule('conf/morgagni2-4.frm')
+
+print(checkMorgagni2.check(forMorgagni2_1))
+print(checkMorgagni2.check(forMorgagni2_2))
+print(checkMorgagni2.check(forMorgagni2_3))
+print(checkMorgagni2.check(forMorgagni2_4))
 
 
 print('============== BOOK 6.4')
