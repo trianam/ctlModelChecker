@@ -9,8 +9,8 @@ f7 ap sv
 f8 ap pv
 
 f0 f1
-f1 f2 sx
-f1 f3 dx
+f1 f2 <
+f1 f3 >
 f2 f4
 f2 f5
 f3 f6

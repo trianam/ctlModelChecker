@@ -8,11 +8,11 @@ f6 !
 f7 ap b
 f8 ap a
 
-f0 f1 sx
-f0 f2 dx
+f0 f1 <
+f0 f2 >
 f2 f3
 f2 f4
 f3 f5
-f4 f6 sx
-f4 f7 dx
+f4 f6 <
+f4 f7 >
 f6 f8
