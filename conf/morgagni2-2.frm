@@ -1,10 +1,10 @@
-f0 forallAlways //forallAlways((sr and pc)implies forallNext(sv and pv))
-f1 implies
-f2 and
-f3 forallNext
+f0 AG //AG((sr & pc)-> AX(sv & pv))
+f1 ->
+f2 &
+f3 AX
 f4 ap sr
 f5 ap pc
-f6 and
+f6 &
 f7 ap sv
 f8 ap pv
 

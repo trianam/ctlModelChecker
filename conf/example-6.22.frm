@@ -1,10 +1,10 @@
-f0 and
-f1 existsNext
-f2 existsUntil
+f0 &
+f1 EX
+f2 EU
 f3 ap a
 f4 ap b
-f5 existsAlways
-f6 not
+f5 EG
+f6 !
 f7 ap c
 
 f0 f1

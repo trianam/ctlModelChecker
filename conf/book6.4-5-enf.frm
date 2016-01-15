@@ -1,7 +1,7 @@
-f0 not
-f1 existsUntil
+f0 !
+f1 EU
 f2 true
-f3 not
+f3 !
 f4 ap a
 
 f0 f1

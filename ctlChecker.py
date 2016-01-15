@@ -5,18 +5,18 @@ class CtlChecker:
         self._callDic = {
             'true':self._satTrue,
             'ap':self._satAp,
-            'and':self._satAnd,
-            'or':self._satConversionTwoSons,
-            'not':self._satNot,
-            'implies':self._satConversionTwoSonsOrdered,
-            'existsNext':self._satExNext,
-            'existsUntil':self._satExUntil,
-            'existsAlways':self._satExAlways,
-            'existsEventually':self._satConversionOneSon,
-            'forallNext':self._satConversionOneSon,
-            'forallUntil':self._satConversionTwoSonsOrdered,
-            'forallAlways':self._satConversionOneSon,
-            'forallEventually':self._satConversionOneSon,
+            '&':self._satAnd,
+            '|':self._satConversionTwoSons,
+            '!':self._satNot,
+            '->':self._satConversionTwoSonsOrdered,
+            'EX':self._satExNext,
+            'EU':self._satExUntil,
+            'EG':self._satExAlways,
+            'EF':self._satConversionOneSon,
+            'AX':self._satConversionOneSon,
+            'AU':self._satConversionTwoSonsOrdered,
+            'AG':self._satConversionOneSon,
+            'AF':self._satConversionOneSon,
             'phi':self._satPhi,
         }
 
@@ -28,13 +28,13 @@ class CtlChecker:
         self._convPhi = dict()
         self._convPsi = dict()
         
-        self._convTree['implies'], self._convRoot['implies'], self._convPhi['implies'], self._convPsi['implies'] = factory.createImpliesTree()
-        self._convTree['or'], self._convRoot['or'], self._convPhi['or'], self._convPsi['or'] = factory.createOrTree()
-        self._convTree['existsEventually'], self._convRoot['existsEventually'], self._convPhi['existsEventually'] = factory.createExEventuallyTree()
-        self._convTree['forallNext'], self._convRoot['forallNext'], self._convPhi['forallNext'] = factory.createFaNextTree()
-        self._convTree['forallUntil'], self._convRoot['forallUntil'], self._convPhi['forallUntil'], self._convPsi['forallUntil'] = factory.createFaUntilTree()
-        self._convTree['forallAlways'], self._convRoot['forallAlways'], self._convPhi['forallAlways'] = factory.createFaAlwaysTree()
-        self._convTree['forallEventually'], self._convRoot['forallEventually'], self._convPhi['forallEventually'] = factory.createFaEventuallyTree()
+        self._convTree['->'], self._convRoot['->'], self._convPhi['->'], self._convPsi['->'] = factory.createImpliesTree()
+        self._convTree['|'], self._convRoot['|'], self._convPhi['|'], self._convPsi['|'] = factory.createOrTree()
+        self._convTree['EF'], self._convRoot['EF'], self._convPhi['EF'] = factory.createExEventuallyTree()
+        self._convTree['AX'], self._convRoot['AX'], self._convPhi['AX'] = factory.createFaNextTree()
+        self._convTree['AU'], self._convRoot['AU'], self._convPhi['AU'], self._convPsi['AU'] = factory.createFaUntilTree()
+        self._convTree['AG'], self._convRoot['AG'], self._convPhi['AG'] = factory.createFaAlwaysTree()
+        self._convTree['AF'], self._convRoot['AF'], self._convPhi['AF'] = factory.createFaEventuallyTree()
         
     def _satTrue(self, tree, root):
         return set(self._ts.graph.nodes())

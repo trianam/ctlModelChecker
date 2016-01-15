@@ -1,5 +1,5 @@
-f0 existsAlways
-f1 not
+f0 EG
+f1 !
 f2 ap mv
 
 f0 f1

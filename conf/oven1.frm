@@ -1,10 +1,10 @@
-s0 not
-s1 existsUntil
+s0 !
+s1 EU
 s2 true
-s3 and
+s3 &
 s4 ap start
-s5 existsAlways
-s6 not
+s5 EG
+s6 !
 s7 ap heat
 
 s0 s1

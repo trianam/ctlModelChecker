@@ -1,4 +1,4 @@
-f0 forallUntil
+f0 AU
 f1 ap a
 f2 ap b
 

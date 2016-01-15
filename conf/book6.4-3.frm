@@ -1,5 +1,5 @@
-f0 existsEventually
-f1 existsAlways
+f0 EF
+f1 EG
 f2 ap a
 
 f0 f1

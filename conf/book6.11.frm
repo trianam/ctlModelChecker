@@ -1,4 +1,4 @@
-f0 or
+f0 |
 f1 ap a
 f2 ap c
 

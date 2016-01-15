@@ -1,6 +1,6 @@
-f0 existsUntil
+f0 EU
 f1 true
-f2 existsAlways
+f2 EG
 f3 ap a
 
 f0 f1 sx

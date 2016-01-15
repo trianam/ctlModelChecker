@@ -1,6 +1,6 @@
-f0 not
-f1 existsNext
-f2 not
+f0 !
+f1 EX
+f2 !
 f3 ap a
 
 f0 f1

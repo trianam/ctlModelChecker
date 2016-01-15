@@ -8,15 +8,15 @@ class ConversionFactory:
 
         #add big not
         nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form='not')
+        tree.add_node(nodeNot1, form='!')
 
         #add and
         nodeAnd = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd, form='and')
+        tree.add_node(nodeAnd, form='&')
 
         #add right not
         nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form='not')
+        tree.add_node(nodeNot2, form='!')
         
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
@@ -40,19 +40,19 @@ class ConversionFactory:
         
         #add big not
         nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form='not')
+        tree.add_node(nodeNot1, form='!')
 
         #add and
         nodeAnd = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd, form='and')
+        tree.add_node(nodeAnd, form='&')
 
         #add left not
         nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form='not')
+        tree.add_node(nodeNot2, form='!')
 
         #add right not
         nodeNot3 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot3, form='not')
+        tree.add_node(nodeNot3, form='!')
 
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
@@ -78,7 +78,7 @@ class ConversionFactory:
 
         #add exists until
         nodeUntil = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeUntil, form='existsUntil')
+        tree.add_node(nodeUntil, form='EU')
 
         #add true
         nodeTrue = nx.utils.misc.generate_unique_node()
@@ -100,15 +100,15 @@ class ConversionFactory:
 
         #add outer not
         nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form='not')
+        tree.add_node(nodeNot1, form='!')
 
         #add exist next
         nodeNext = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNext, form='existsNext')
+        tree.add_node(nodeNext, form='EX')
 
         #add inner not
         nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form='not')
+        tree.add_node(nodeNot2, form='!')
 
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
@@ -127,43 +127,43 @@ class ConversionFactory:
 
         #add and
         nodeAnd1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd1, form='and')
+        tree.add_node(nodeAnd1, form='&')
 
         #add left not
         nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form='not')
+        tree.add_node(nodeNot1, form='!')
 
         #add right not
         nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form='not')
+        tree.add_node(nodeNot2, form='!')
 
         #add exists until
         nodeUntil = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeUntil, form='existsUntil')
+        tree.add_node(nodeUntil, form='EU')
 
         #add exists always
         nodeAlways = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAlways, form='existsAlways')
+        tree.add_node(nodeAlways, form='EG')
 
         #add another not
         nodeNot3 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot3, form='not')
+        tree.add_node(nodeNot3, form='!')
 
         #add another and
         nodeAnd2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd2, form='and')
+        tree.add_node(nodeAnd2, form='&')
 
         #add one more not
         nodeNot4 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot4, form='not')
+        tree.add_node(nodeNot4, form='!')
 
         #add even more nots
         nodeNot5 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot5, form='not')
+        tree.add_node(nodeNot5, form='!')
 
         #add too much nots
         nodeNot6 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot6, form='not')
+        tree.add_node(nodeNot6, form='!')
 
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
@@ -196,11 +196,11 @@ class ConversionFactory:
 
         #add outer not
         nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form='not')
+        tree.add_node(nodeNot1, form='!')
 
         #add exists until
         nodeUntil = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeUntil, form='existsUntil')
+        tree.add_node(nodeUntil, form='EU')
 
         #add true
         nodeTrue = nx.utils.misc.generate_unique_node()
@@ -208,7 +208,7 @@ class ConversionFactory:
 
         #add inner not
         nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form='not')
+        tree.add_node(nodeNot2, form='!')
 
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
@@ -228,15 +228,15 @@ class ConversionFactory:
 
         #add outer not
         nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form='not')
+        tree.add_node(nodeNot1, form='!')
 
         #add exists always
         nodeAlways = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAlways, form='existsAlways')
+        tree.add_node(nodeAlways, form='EG')
 
         #add inner not
         nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form='not')
+        tree.add_node(nodeNot2, form='!')
 
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()

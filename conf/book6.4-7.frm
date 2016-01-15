@@ -1,10 +1,10 @@
-f0 existsUntil
+f0 EU
 f1 ap a
-f2 and
-f3 not
-f4 forallUntil
+f2 &
+f3 !
+f4 AU
 f5 ap a
-f6 not
+f6 !
 f7 ap b
 f8 ap a
 

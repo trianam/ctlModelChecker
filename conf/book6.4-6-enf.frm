@@ -1,17 +1,17 @@
-f0 and
-f1 not
-f2 not
-f3 existsUntil
-f4 existsAlways
-f5 and
-f6 and
-f7 and
+f0 &
+f1 !
+f2 !
+f3 EU
+f4 EG
+f5 &
+f6 &
+f7 &
 f8 ap a
-f9 not
-f10 not
-f11 not
+f9 !
+f10 !
+f11 !
 f12 ap a
-f13 not
+f13 !
 f14 ap b
 f15 ap a
 f16 ap b
