@@ -377,7 +377,7 @@ class Conversions(object):
     def _createExistsWeakUntilTree(self):
         """
         Tree for converting 'E(phi W psi)' in 
-        '!A((phi & !psi) U (!phi & !psi))'.
+        '!(!E(phi U psi) & !EG(phi))'.
         """
         
         tree = nx.DiGraph()
@@ -386,29 +386,25 @@ class Conversions(object):
         nodeNot1 = nx.utils.misc.generate_unique_node()
         tree.add_node(nodeNot1, form=self._syntax.lnot)
 
-        #add AU
-        nodeAU = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAU, form=self._syntax.faUntil)
+        #add and
+        nodeAnd = nx.utils.misc.generate_unique_node()
+        tree.add_node(nodeAnd, form=self._syntax.land)
 
-        #add left and
-        nodeAnd1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd1, form=self._syntax.land)
-
-        #add right and
-        nodeAnd2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd2, form=self._syntax.land)
-
-        #add left-right not
+        #add left not
         nodeNot2 = nx.utils.misc.generate_unique_node()
         tree.add_node(nodeNot2, form=self._syntax.lnot)
         
-        #add right-left not
+        #add right not
         nodeNot3 = nx.utils.misc.generate_unique_node()
         tree.add_node(nodeNot3, form=self._syntax.lnot)
+        
+        #add EU
+        nodeEU = nx.utils.misc.generate_unique_node()
+        tree.add_node(nodeEU, form=self._syntax.exUntil)
 
-        #add right-right not
-        nodeNot4 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot4, form=self._syntax.lnot)
+        #add EG
+        nodeEG = nx.utils.misc.generate_unique_node()
+        tree.add_node(nodeEG, form=self._syntax.exAlways)
         
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
@@ -418,16 +414,14 @@ class Conversions(object):
         nodePsi = nx.utils.misc.generate_unique_node()
         tree.add_node(nodePsi, form=self._syntax.phiNode, sat=set())
 
-        tree.add_edge(nodeNot1, nodeAU)
-        tree.add_edge(nodeAU, nodeAnd1, son=self._syntax.leftSon)
-        tree.add_edge(nodeAU, nodeAnd2, son=self._syntax.rightSon)
-        tree.add_edge(nodeAnd1, nodePhi)
-        tree.add_edge(nodeAnd1, nodeNot2)
-        tree.add_edge(nodeNot2, nodePsi)
-        tree.add_edge(nodeAnd2, nodeNot3)
-        tree.add_edge(nodeAnd2, nodeNot4)        
-        tree.add_edge(nodeNot3, nodePhi)
-        tree.add_edge(nodeNot4, nodePsi)
+        tree.add_edge(nodeNot1, nodeAnd)
+        tree.add_edge(nodeAnd, nodeNot2)
+        tree.add_edge(nodeAnd, nodeNot3)
+        tree.add_edge(nodeNot2, nodeEU)
+        tree.add_edge(nodeNot3, nodeEG)
+        tree.add_edge(nodeEU, nodePhi, son=self._syntax.leftSon)
+        tree.add_edge(nodeEU, nodePsi, son=self._syntax.rightSon)
+        tree.add_edge(nodeEG, nodePhi)
 
         return (tree, nodeNot1, nodePhi, nodePsi)
         
