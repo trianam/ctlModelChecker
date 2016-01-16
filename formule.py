@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 import networkx as nx
+import syntax
 
 class Formule:
     def __init__(self, filename):
+        self._s = syntax.Syntax()
         self.graph = nx.DiGraph()
         
         f = open(filename, 'r')
@@ -15,7 +17,7 @@ class Formule:
                 continue
 
             if nodesPart:
-                if (fields[1] == 'ap'):
+                if (fields[1] == self._s.ap):
                     self.graph.add_node(fields[0], root=firstLine, form=fields[1], val=fields[2])
                 else:
                     self.graph.add_node(fields[0], root=firstLine, form=fields[1])
@@ -31,7 +33,7 @@ class Formule:
     #     treeList = dict()
     #     node = [s for s,a in phi.graph.nodes(data=True) if a['root'] ==True][0]
     #     treeList['form'] = node['form']
-    #     if treeList['form'] == 'ap':
+    #     if treeList['form'] == self._s.ap:
     #         treeList['val'] = node['val']
 
     #     nodes = self.graph.successors(nodo)

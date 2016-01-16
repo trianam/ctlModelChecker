@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 import networkx as nx
+import syntax
 
 class Ts:
     def __init__(self, filename):
+        self._s = syntax.Syntax()        
         self.graph = nx.DiGraph()
         
         f = open(filename, 'r')
@@ -15,9 +17,9 @@ class Ts:
 
             if nodesPart:
                 if (len(fields) <= 2):
-                    self.graph.add_node(fields[0], initial=(fields[1]=='true'), att=[])
+                    self.graph.add_node(fields[0], initial=(fields[1]==self._s.true), att=[])
                 else:
-                    self.graph.add_node(fields[0], initial=(fields[1]=='true'), att=fields[2].split(',',fields[2].count(',')))
+                    self.graph.add_node(fields[0], initial=(fields[1]==self._s.true), att=fields[2].split(',',fields[2].count(',')))
 
             else:
                 self.graph.add_edge(fields[0], fields[1])

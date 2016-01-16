@@ -1,26 +1,29 @@
 import conversionFactory as cf
+import syntax
 
 class CtlChecker:
     def __init__(self, ts):
+        self._s = syntax.Syntax()
+        
         self._callDic = {
-            'true':self._satTrue,
-            'ap':self._satAp,
-            '&':self._satAnd,
-            '|':self._satConversionTwoSons,
-            '!':self._satNot,
-            '->':self._satConversionTwoSonsOrdered,
-            '=':self._satConversionTwoSons,
-            'EX':self._satExNext,
-            'EU':self._satExUntil,
-            'EG':self._satExAlways,
-            'EF':self._satConversionOneSon,
-            'AX':self._satConversionOneSon,
-            'AU':self._satConversionTwoSonsOrdered,
-            'AG':self._satConversionOneSon,
-            'AF':self._satConversionOneSon,
-            'EW':self._satConversionTwoSonsOrdered,
-            'AW':self._satConversionTwoSonsOrdered,
-            'phi':self._satPhi,
+            self._s.true          :  self._satTrue,
+            self._s.ap            :  self._satAp,
+            self._s.land          :  self._satAnd,
+            self._s.lor           :  self._satConversionTwoSons,
+            self._s.lnot          :  self._satNot,
+            self._s.implies       :  self._satConversionTwoSonsOrdered,
+            self._s.equals        :  self._satConversionTwoSons,
+            self._s.exNext        :  self._satExNext,
+            self._s.exUntil       :  self._satExUntil,
+            self._s.exAlways      :  self._satExAlways,
+            self._s.exEventually  :  self._satConversionOneSon,
+            self._s.faNext        :  self._satConversionOneSon,
+            self._s.faUntil       :  self._satConversionTwoSonsOrdered,
+            self._s.faAlways      :  self._satConversionOneSon,
+            self._s.faEventually  :  self._satConversionOneSon,
+            self._s.exWeakUntil   :  self._satConversionTwoSonsOrdered,
+            self._s.faWeakUntil   :  self._satConversionTwoSonsOrdered,
+            self._s.phiNode       :  self._satPhi,
         }
 
         self._ts = ts
@@ -30,17 +33,10 @@ class CtlChecker:
         self._convRoot = dict()
         self._convPhi = dict()
         self._convPsi = dict()
+
+        self._convTree, self._convRoot, self._convPhi, self._convPsi = factory.createConversionDictionaries()
+
         
-        self._convTree['->'], self._convRoot['->'], self._convPhi['->'], self._convPsi['->'] = factory.createImpliesTree()
-        self._convTree['='], self._convRoot['='], self._convPhi['='], self._convPsi['='] = factory.createEqualTree()
-        self._convTree['|'], self._convRoot['|'], self._convPhi['|'], self._convPsi['|'] = factory.createOrTree()
-        self._convTree['EF'], self._convRoot['EF'], self._convPhi['EF'] = factory.createExEventuallyTree()
-        self._convTree['AX'], self._convRoot['AX'], self._convPhi['AX'] = factory.createFaNextTree()
-        self._convTree['AU'], self._convRoot['AU'], self._convPhi['AU'], self._convPsi['AU'] = factory.createFaUntilTree()
-        self._convTree['AG'], self._convRoot['AG'], self._convPhi['AG'] = factory.createFaAlwaysTree()
-        self._convTree['AF'], self._convRoot['AF'], self._convPhi['AF'] = factory.createFaEventuallyTree()
-        self._convTree['EW'], self._convRoot['EW'], self._convPhi['EW'], self._convPsi['EW'] = factory.createExistsWeakUntilTree()
-        self._convTree['AW'], self._convRoot['AW'], self._convPhi['AW'], self._convPsi['AW'] = factory.createForallWeakUntilTree()
         
     def _satTrue(self, tree, root):
         return set(self._ts.graph.nodes())
@@ -73,8 +69,8 @@ class CtlChecker:
         return retSet
 
     def _satExUntil(self, tree, root):
-        leftSon = [x for x in tree[root] if tree[root][x]['son'] == '<'][0]
-        rightSon = [x for x in tree[root] if tree[root][x]['son'] == '>'][0]
+        leftSon = [x for x in tree[root] if tree[root][x]['son'] == self._s.leftSon][0]
+        rightSon = [x for x in tree[root] if tree[root][x]['son'] == self._s.rightSon][0]
         
         E = self._sat(tree, rightSon)
         T = E.copy()
@@ -123,8 +119,8 @@ class CtlChecker:
         return self._sat(self._convTree[form], self._convRoot[form])
 
     def _satConversionTwoSonsOrdered(self, tree, root):
-        leftSon = [x for x in tree[root] if tree[root][x]['son'] == '<'][0]
-        rightSon = [x for x in tree[root] if tree[root][x]['son'] == '>'][0]
+        leftSon = [x for x in tree[root] if tree[root][x]['son'] == self._s.leftSon][0]
+        rightSon = [x for x in tree[root] if tree[root][x]['son'] == self._s.rightSon][0]
         form = tree.node[root]['form']
         self._convTree[form].node[self._convPhi[form]]['sat'] = self._sat(tree, leftSon)
         self._convTree[form].node[self._convPsi[form]]['sat'] = self._sat(tree, rightSon)
