@@ -1,29 +1,39 @@
 import networkx as nx
 import syntax
 
-class ConversionFactory:
+class Conversions(object):
     def __init__(self):
-        self._s = syntax.Syntax()
+        self._syntax = syntax.Syntax()
 
-    def createConversionDictionaries(self):
-        convTree = dict()
-        convRoot = dict()
-        convPhi = dict()
-        convPsi = dict()
+        self._trees = dict()
+        self._roots = dict()
+        self._phis = dict()
+        self._psis = dict()
 
-        convTree[self._s.implies], convRoot[self._s.implies], convPhi[self._s.implies], convPsi[self._s.implies] = self._createImpliesTree()
-        convTree[self._s.equals], convRoot[self._s.equals], convPhi[self._s.equals], convPsi[self._s.equals] = self._createEqualTree()
-        convTree[self._s.lor], convRoot[self._s.lor], convPhi[self._s.lor], convPsi[self._s.lor] = self._createOrTree()
-        convTree[self._s.exEventually], convRoot[self._s.exEventually], convPhi[self._s.exEventually] = self._createExEventuallyTree()
-        convTree[self._s.faNext], convRoot[self._s.faNext], convPhi[self._s.faNext] = self._createFaNextTree()
-        convTree[self._s.faUntil], convRoot[self._s.faUntil], convPhi[self._s.faUntil], convPsi[self._s.faUntil] = self._createFaUntilTree()
-        convTree[self._s.faAlways], convRoot[self._s.faAlways], convPhi[self._s.faAlways] = self._createFaAlwaysTree()
-        convTree[self._s.faEventually], convRoot[self._s.faEventually], convPhi[self._s.faEventually] = self._createFaEventuallyTree()
-        convTree[self._s.exWeakUntil], convRoot[self._s.exWeakUntil], convPhi[self._s.exWeakUntil], convPsi[self._s.exWeakUntil] = self._createExistsWeakUntilTree()
-        convTree[self._s.faWeakUntil], convRoot[self._s.faWeakUntil], convPhi[self._s.faWeakUntil], convPsi[self._s.faWeakUntil] = self._createForallWeakUntilTree()
-        return(convTree, convRoot, convPhi, convPsi)
+        self._trees[self._syntax.implies], self._roots[self._syntax.implies], self._phis[self._syntax.implies], self._psis[self._syntax.implies] = self._createImpliesTree()
+        self._trees[self._syntax.equals], self._roots[self._syntax.equals], self._phis[self._syntax.equals], self._psis[self._syntax.equals] = self._createEqualTree()
+        self._trees[self._syntax.lor], self._roots[self._syntax.lor], self._phis[self._syntax.lor], self._psis[self._syntax.lor] = self._createOrTree()
+        self._trees[self._syntax.exEventually], self._roots[self._syntax.exEventually], self._phis[self._syntax.exEventually] = self._createExEventuallyTree()
+        self._trees[self._syntax.faNext], self._roots[self._syntax.faNext], self._phis[self._syntax.faNext] = self._createFaNextTree()
+        self._trees[self._syntax.faUntil], self._roots[self._syntax.faUntil], self._phis[self._syntax.faUntil], self._psis[self._syntax.faUntil] = self._createFaUntilTree()
+        self._trees[self._syntax.faAlways], self._roots[self._syntax.faAlways], self._phis[self._syntax.faAlways] = self._createFaAlwaysTree()
+        self._trees[self._syntax.faEventually], self._roots[self._syntax.faEventually], self._phis[self._syntax.faEventually] = self._createFaEventuallyTree()
+        self._trees[self._syntax.exWeakUntil], self._roots[self._syntax.exWeakUntil], self._phis[self._syntax.exWeakUntil], self._psis[self._syntax.exWeakUntil] = self._createExistsWeakUntilTree()
+        self._trees[self._syntax.faWeakUntil], self._roots[self._syntax.faWeakUntil], self._phis[self._syntax.faWeakUntil], self._psis[self._syntax.faWeakUntil] = self._createForallWeakUntilTree()
 
-
+    @property
+    def trees(self):
+        return self._trees
+    @property
+    def roots(self):
+        return self._roots
+    @property
+    def phis(self):
+        return self._phis
+    @property
+    def psis(self):
+        return self._psis
+    
     def _createEqualTree(self):
         tree = nx.DiGraph()
 
@@ -31,43 +41,43 @@ class ConversionFactory:
 
         #add big not
         nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form=self._s.lnot)
+        tree.add_node(nodeNot1, form=self._syntax.lnot)
 
         #add big and
         nodeAnd1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd1, form=self._s.land)
+        tree.add_node(nodeAnd1, form=self._syntax.land)
 
         #add left not
         nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form=self._s.lnot)
+        tree.add_node(nodeNot2, form=self._syntax.lnot)
         
         #add right not
         nodeNot3 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot3, form=self._s.lnot)
+        tree.add_node(nodeNot3, form=self._syntax.lnot)
 
         #add left and
         nodeAnd2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd2, form=self._s.land)
+        tree.add_node(nodeAnd2, form=self._syntax.land)
 
         #add right and
         nodeAnd3 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd3, form=self._s.land)
+        tree.add_node(nodeAnd3, form=self._syntax.land)
 
         #add right-left not
         nodeNot4 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot4, form=self._s.lnot)
+        tree.add_node(nodeNot4, form=self._syntax.lnot)
         
         #add right-right not
         nodeNot5 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot5, form=self._s.lnot)
+        tree.add_node(nodeNot5, form=self._syntax.lnot)
         
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePhi, form=self._syntax.phiNode, sat=set())
         
         #add psi
         nodePsi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePsi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePsi, form=self._syntax.phiNode, sat=set())
 
         tree.add_edge(nodeNot1, nodeAnd1)
         tree.add_edge(nodeAnd1, nodeNot2)
@@ -90,23 +100,23 @@ class ConversionFactory:
 
         #add big not
         nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form=self._s.lnot)
+        tree.add_node(nodeNot1, form=self._syntax.lnot)
 
         #add and
         nodeAnd = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd, form=self._s.land)
+        tree.add_node(nodeAnd, form=self._syntax.land)
 
         #add right not
         nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form=self._s.lnot)
+        tree.add_node(nodeNot2, form=self._syntax.lnot)
         
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePhi, form=self._syntax.phiNode, sat=set())
         
         #add psi
         nodePsi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePsi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePsi, form=self._syntax.phiNode, sat=set())
 
         tree.add_edge(nodeNot1, nodeAnd)
         tree.add_edge(nodeAnd, nodePhi)
@@ -122,27 +132,27 @@ class ConversionFactory:
         
         #add big not
         nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form=self._s.lnot)
+        tree.add_node(nodeNot1, form=self._syntax.lnot)
 
         #add and
         nodeAnd = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd, form=self._s.land)
+        tree.add_node(nodeAnd, form=self._syntax.land)
 
         #add left not
         nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form=self._s.lnot)
+        tree.add_node(nodeNot2, form=self._syntax.lnot)
 
         #add right not
         nodeNot3 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot3, form=self._s.lnot)
+        tree.add_node(nodeNot3, form=self._syntax.lnot)
 
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePhi, form=self._syntax.phiNode, sat=set())
         
         #add psi
         nodePsi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePsi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePsi, form=self._syntax.phiNode, sat=set())
 
         tree.add_edge(nodeNot1, nodeAnd)
         tree.add_edge(nodeAnd, nodeNot2)
@@ -160,18 +170,18 @@ class ConversionFactory:
 
         #add exists until
         nodeUntil = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeUntil, form=self._s.exUntil)
+        tree.add_node(nodeUntil, form=self._syntax.exUntil)
 
         #add true
         nodeTrue = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeTrue, form=self._s.true)
+        tree.add_node(nodeTrue, form=self._syntax.true)
 
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePhi, form=self._syntax.phiNode, sat=set())
 
-        tree.add_edge(nodeUntil, nodeTrue, son=self._s.leftSon)
-        tree.add_edge(nodeUntil, nodePhi, son=self._s.rightSon)
+        tree.add_edge(nodeUntil, nodeTrue, son=self._syntax.leftSon)
+        tree.add_edge(nodeUntil, nodePhi, son=self._syntax.rightSon)
 
         return (tree, nodeUntil, nodePhi)
 
@@ -182,19 +192,19 @@ class ConversionFactory:
 
         #add outer not
         nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form=self._s.lnot)
+        tree.add_node(nodeNot1, form=self._syntax.lnot)
 
         #add exist next
         nodeNext = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNext, form=self._s.exNext)
+        tree.add_node(nodeNext, form=self._syntax.exNext)
 
         #add inner not
         nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form=self._s.lnot)
+        tree.add_node(nodeNot2, form=self._syntax.lnot)
 
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePhi, form=self._syntax.phiNode, sat=set())
 
         tree.add_edge(nodeNot1, nodeNext)
         tree.add_edge(nodeNext, nodeNot2)
@@ -209,58 +219,58 @@ class ConversionFactory:
 
         #add and
         nodeAnd1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd1, form=self._s.land)
+        tree.add_node(nodeAnd1, form=self._syntax.land)
 
         #add left not
         nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form=self._s.lnot)
+        tree.add_node(nodeNot1, form=self._syntax.lnot)
 
         #add right not
         nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form=self._s.lnot)
+        tree.add_node(nodeNot2, form=self._syntax.lnot)
 
         #add exists until
         nodeUntil = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeUntil, form=self._s.exUntil)
+        tree.add_node(nodeUntil, form=self._syntax.exUntil)
 
         #add exists always
         nodeAlways = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAlways, form=self._s.exAlways)
+        tree.add_node(nodeAlways, form=self._syntax.exAlways)
 
         #add another not
         nodeNot3 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot3, form=self._s.lnot)
+        tree.add_node(nodeNot3, form=self._syntax.lnot)
 
         #add another and
         nodeAnd2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd2, form=self._s.land)
+        tree.add_node(nodeAnd2, form=self._syntax.land)
 
         #add one more not
         nodeNot4 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot4, form=self._s.lnot)
+        tree.add_node(nodeNot4, form=self._syntax.lnot)
 
         #add even more nots
         nodeNot5 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot5, form=self._s.lnot)
+        tree.add_node(nodeNot5, form=self._syntax.lnot)
 
         #add too much nots
         nodeNot6 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot6, form=self._s.lnot)
+        tree.add_node(nodeNot6, form=self._syntax.lnot)
 
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePhi, form=self._syntax.phiNode, sat=set())
         
         #add psi
         nodePsi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePsi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePsi, form=self._syntax.phiNode, sat=set())
 
         tree.add_edge(nodeAnd1, nodeNot1)
         tree.add_edge(nodeAnd1, nodeNot2)
         tree.add_edge(nodeNot1, nodeUntil)
         tree.add_edge(nodeNot2, nodeAlways)
-        tree.add_edge(nodeUntil, nodeNot3, son=self._s.leftSon)
-        tree.add_edge(nodeUntil, nodeAnd2, son=self._s.rightSon)
+        tree.add_edge(nodeUntil, nodeNot3, son=self._syntax.leftSon)
+        tree.add_edge(nodeUntil, nodeAnd2, son=self._syntax.rightSon)
         tree.add_edge(nodeAlways, nodeNot4)
         tree.add_edge(nodeAnd2, nodeNot5)
         tree.add_edge(nodeAnd2, nodeNot6)
@@ -278,27 +288,27 @@ class ConversionFactory:
 
         #add outer not
         nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form=self._s.lnot)
+        tree.add_node(nodeNot1, form=self._syntax.lnot)
 
         #add exists until
         nodeUntil = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeUntil, form=self._s.exUntil)
+        tree.add_node(nodeUntil, form=self._syntax.exUntil)
 
         #add true
         nodeTrue = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeTrue, form=self._s.true)
+        tree.add_node(nodeTrue, form=self._syntax.true)
 
         #add inner not
         nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form=self._s.lnot)
+        tree.add_node(nodeNot2, form=self._syntax.lnot)
 
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePhi, form=self._syntax.phiNode, sat=set())
         
         tree.add_edge(nodeNot1, nodeUntil)
-        tree.add_edge(nodeUntil, nodeTrue, son=self._s.leftSon)
-        tree.add_edge(nodeUntil, nodeNot2, son=self._s.rightSon)
+        tree.add_edge(nodeUntil, nodeTrue, son=self._syntax.leftSon)
+        tree.add_edge(nodeUntil, nodeNot2, son=self._syntax.rightSon)
         tree.add_edge(nodeNot2, nodePhi)
 
         return (tree, nodeNot1, nodePhi)
@@ -310,19 +320,19 @@ class ConversionFactory:
 
         #add outer not
         nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form=self._s.lnot)
+        tree.add_node(nodeNot1, form=self._syntax.lnot)
 
         #add exists always
         nodeAlways = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAlways, form=self._s.exAlways)
+        tree.add_node(nodeAlways, form=self._syntax.exAlways)
 
         #add inner not
         nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form=self._s.lnot)
+        tree.add_node(nodeNot2, form=self._syntax.lnot)
 
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePhi, form=self._syntax.phiNode, sat=set())
         
         tree.add_edge(nodeNot1, nodeAlways)
         tree.add_edge(nodeAlways, nodeNot2)
@@ -337,43 +347,43 @@ class ConversionFactory:
 
         #add big not
         nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form=self._s.lnot)
+        tree.add_node(nodeNot1, form=self._syntax.lnot)
 
         #add AU
         nodeAU = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAU, form=self._s.faUntil)
+        tree.add_node(nodeAU, form=self._syntax.faUntil)
 
         #add left and
         nodeAnd1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd1, form=self._s.land)
+        tree.add_node(nodeAnd1, form=self._syntax.land)
 
         #add right and
         nodeAnd2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd2, form=self._s.land)
+        tree.add_node(nodeAnd2, form=self._syntax.land)
 
         #add left-right not
         nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form=self._s.lnot)
+        tree.add_node(nodeNot2, form=self._syntax.lnot)
         
         #add right-left not
         nodeNot3 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot3, form=self._s.lnot)
+        tree.add_node(nodeNot3, form=self._syntax.lnot)
 
         #add right-right not
         nodeNot4 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot4, form=self._s.lnot)
+        tree.add_node(nodeNot4, form=self._syntax.lnot)
         
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePhi, form=self._syntax.phiNode, sat=set())
         
         #add psi
         nodePsi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePsi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePsi, form=self._syntax.phiNode, sat=set())
 
         tree.add_edge(nodeNot1, nodeAU)
-        tree.add_edge(nodeAU, nodeAnd1, son=self._s.leftSon)
-        tree.add_edge(nodeAU, nodeAnd2, son=self._s.rightSon)
+        tree.add_edge(nodeAU, nodeAnd1, son=self._syntax.leftSon)
+        tree.add_edge(nodeAU, nodeAnd2, son=self._syntax.rightSon)
         tree.add_edge(nodeAnd1, nodePhi)
         tree.add_edge(nodeAnd1, nodeNot2)
         tree.add_edge(nodeNot2, nodePsi)
@@ -391,43 +401,43 @@ class ConversionFactory:
 
         #add big not
         nodeNot1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot1, form=self._s.lnot)
+        tree.add_node(nodeNot1, form=self._syntax.lnot)
 
         #add EU
         nodeEU = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeEU, form=self._s.exUntil)
+        tree.add_node(nodeEU, form=self._syntax.exUntil)
 
         #add left and
         nodeAnd1 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd1, form=self._s.land)
+        tree.add_node(nodeAnd1, form=self._syntax.land)
 
         #add right and
         nodeAnd2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeAnd2, form=self._s.land)
+        tree.add_node(nodeAnd2, form=self._syntax.land)
 
         #add left-right not
         nodeNot2 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot2, form=self._s.lnot)
+        tree.add_node(nodeNot2, form=self._syntax.lnot)
         
         #add right-left not
         nodeNot3 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot3, form=self._s.lnot)
+        tree.add_node(nodeNot3, form=self._syntax.lnot)
 
         #add right-right not
         nodeNot4 = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodeNot4, form=self._s.lnot)
+        tree.add_node(nodeNot4, form=self._syntax.lnot)
         
         #add phi
         nodePhi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePhi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePhi, form=self._syntax.phiNode, sat=set())
         
         #add psi
         nodePsi = nx.utils.misc.generate_unique_node()
-        tree.add_node(nodePsi, form=self._s.phiNode, sat=set())
+        tree.add_node(nodePsi, form=self._syntax.phiNode, sat=set())
 
         tree.add_edge(nodeNot1, nodeEU)
-        tree.add_edge(nodeEU, nodeAnd1, son=self._s.leftSon)
-        tree.add_edge(nodeEU, nodeAnd2, son=self._s.rightSon)
+        tree.add_edge(nodeEU, nodeAnd1, son=self._syntax.leftSon)
+        tree.add_edge(nodeEU, nodeAnd2, son=self._syntax.rightSon)
         tree.add_edge(nodeAnd1, nodePhi)
         tree.add_edge(nodeAnd1, nodeNot2)
         tree.add_edge(nodeNot2, nodePsi)

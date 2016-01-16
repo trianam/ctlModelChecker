@@ -4,7 +4,7 @@ import syntax
 
 class Formule:
     def __init__(self, filename):
-        self._s = syntax.Syntax()
+        self._syntax = syntax.Syntax()
         self.graph = nx.DiGraph()
         
         f = open(filename, 'r')
@@ -17,7 +17,7 @@ class Formule:
                 continue
 
             if nodesPart:
-                if (fields[1] == self._s.ap):
+                if (fields[1] == self._syntax.ap):
                     self.graph.add_node(fields[0], root=firstLine, form=fields[1], val=fields[2])
                 else:
                     self.graph.add_node(fields[0], root=firstLine, form=fields[1])
@@ -29,15 +29,6 @@ class Formule:
                 else:
                     self.graph.add_edge(fields[0], fields[1])
 
-    # def toList(self):
-    #     treeList = dict()
-    #     node = [s for s,a in phi.graph.nodes(data=True) if a['root'] ==True][0]
-    #     treeList['form'] = node['form']
-    #     if treeList['form'] == self._s.ap:
-    #         treeList['val'] = node['val']
-
-    #     nodes = self.graph.successors(nodo)
-            
     def draw(self):
         labels=dict((n,{'l':n,'d':d['form']}) for n,d in self.graph.nodes(data=True))
         nx.draw_networkx(self.graph, labels=labels)

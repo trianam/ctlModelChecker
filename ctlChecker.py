@@ -1,43 +1,33 @@
-import conversionFactory as cf
+import conversions
 import syntax
 
 class CtlChecker:
     def __init__(self, ts):
-        self._s = syntax.Syntax()
+        self._syntax = syntax.Syntax()
+        self._conv = conversions.Conversions()
+        self._ts = ts
         
         self._callDic = {
-            self._s.true          :  self._satTrue,
-            self._s.ap            :  self._satAp,
-            self._s.land          :  self._satAnd,
-            self._s.lor           :  self._satConversionTwoSons,
-            self._s.lnot          :  self._satNot,
-            self._s.implies       :  self._satConversionTwoSonsOrdered,
-            self._s.equals        :  self._satConversionTwoSons,
-            self._s.exNext        :  self._satExNext,
-            self._s.exUntil       :  self._satExUntil,
-            self._s.exAlways      :  self._satExAlways,
-            self._s.exEventually  :  self._satConversionOneSon,
-            self._s.faNext        :  self._satConversionOneSon,
-            self._s.faUntil       :  self._satConversionTwoSonsOrdered,
-            self._s.faAlways      :  self._satConversionOneSon,
-            self._s.faEventually  :  self._satConversionOneSon,
-            self._s.exWeakUntil   :  self._satConversionTwoSonsOrdered,
-            self._s.faWeakUntil   :  self._satConversionTwoSonsOrdered,
-            self._s.phiNode       :  self._satPhi,
+            self._syntax.true          :  self._satTrue,
+            self._syntax.ap            :  self._satAp,
+            self._syntax.land          :  self._satAnd,
+            self._syntax.lor           :  self._satConversionTwoSons,
+            self._syntax.lnot          :  self._satNot,
+            self._syntax.implies       :  self._satConversionTwoSonsOrdered,
+            self._syntax.equals        :  self._satConversionTwoSons,
+            self._syntax.exNext        :  self._satExNext,
+            self._syntax.exUntil       :  self._satExUntil,
+            self._syntax.exAlways      :  self._satExAlways,
+            self._syntax.exEventually  :  self._satConversionOneSon,
+            self._syntax.faNext        :  self._satConversionOneSon,
+            self._syntax.faUntil       :  self._satConversionTwoSonsOrdered,
+            self._syntax.faAlways      :  self._satConversionOneSon,
+            self._syntax.faEventually  :  self._satConversionOneSon,
+            self._syntax.exWeakUntil   :  self._satConversionTwoSonsOrdered,
+            self._syntax.faWeakUntil   :  self._satConversionTwoSonsOrdered,
+            self._syntax.phiNode       :  self._satPhi,
         }
 
-        self._ts = ts
-
-        factory = cf.ConversionFactory()
-        self._convTree = dict()
-        self._convRoot = dict()
-        self._convPhi = dict()
-        self._convPsi = dict()
-
-        self._convTree, self._convRoot, self._convPhi, self._convPsi = factory.createConversionDictionaries()
-
-        
-        
     def _satTrue(self, tree, root):
         return set(self._ts.graph.nodes())
 
@@ -69,8 +59,8 @@ class CtlChecker:
         return retSet
 
     def _satExUntil(self, tree, root):
-        leftSon = [x for x in tree[root] if tree[root][x]['son'] == self._s.leftSon][0]
-        rightSon = [x for x in tree[root] if tree[root][x]['son'] == self._s.rightSon][0]
+        leftSon = [x for x in tree[root] if tree[root][x]['son'] == self._syntax.leftSon][0]
+        rightSon = [x for x in tree[root] if tree[root][x]['son'] == self._syntax.rightSon][0]
         
         E = self._sat(tree, rightSon)
         T = E.copy()
@@ -106,25 +96,26 @@ class CtlChecker:
         form = tree.node[root]['form']
         son = tree.successors(root)[0]
         
-        self._convTree[form].node[self._convPhi[form]]['sat'] = self._sat(tree, son)
-        return self._sat(self._convTree[form], self._convRoot[form])
+        self._conv.trees[form].node[self._conv.phis[form]]['sat'] = self._sat(tree, son)
+        return self._sat(self._conv.trees[form], self._conv.roots[form])
 
     def _satConversionTwoSons(self, tree, root):
         form = tree.node[root]['form']
         leftSon = tree.successors(root)[0]
         rightSon = tree.successors(root)[1]
         
-        self._convTree[form].node[self._convPhi[form]]['sat'] = self._sat(tree, leftSon)
-        self._convTree[form].node[self._convPsi[form]]['sat'] = self._sat(tree, rightSon)
-        return self._sat(self._convTree[form], self._convRoot[form])
+        self._conv.trees[form].node[self._conv.phis[form]]['sat'] = self._sat(tree, leftSon)
+        self._conv.trees[form].node[self._conv.psis[form]]['sat'] = self._sat(tree, rightSon)
+        return self._sat(self._conv.trees[form], self._conv.roots[form])
 
     def _satConversionTwoSonsOrdered(self, tree, root):
-        leftSon = [x for x in tree[root] if tree[root][x]['son'] == self._s.leftSon][0]
-        rightSon = [x for x in tree[root] if tree[root][x]['son'] == self._s.rightSon][0]
         form = tree.node[root]['form']
-        self._convTree[form].node[self._convPhi[form]]['sat'] = self._sat(tree, leftSon)
-        self._convTree[form].node[self._convPsi[form]]['sat'] = self._sat(tree, rightSon)
-        return self._sat(self._convTree[form], self._convRoot[form])
+        leftSon = [x for x in tree[root] if tree[root][x]['son'] == self._syntax.leftSon][0]
+        rightSon = [x for x in tree[root] if tree[root][x]['son'] == self._syntax.rightSon][0]
+        
+        self._conv.trees[form].node[self._conv.phis[form]]['sat'] = self._sat(tree, leftSon)
+        self._conv.trees[form].node[self._conv.psis[form]]['sat'] = self._sat(tree, rightSon)
+        return self._sat(self._conv.trees[form], self._conv.roots[form])
 
     def _satPhi(self, tree, root):
         return tree.node[root]['sat']
