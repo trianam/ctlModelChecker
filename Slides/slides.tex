@@ -94,6 +94,19 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \frametitle{Weak Until}
+  \begin{block}{Equivalenza}
+    \begin{eqnarray*}
+    \exists(\Phi\ctlWeakUntil\Psi) &=&
+    \neg\forall((\Phi\land\neg\Psi)\ctlUntil(\neg\Phi\land\neg\Psi))\\
+    &=&\exists(\Phi\ctlUntil\Psi)\lor\exists\ctlAlways\Phi\\
+    &=&\neg(\neg\exists(\Phi\ctlUntil\Psi)\land\neg\exists\ctlAlways\Phi)\\
+    \forall(\Phi\ctlWeakUntil\Psi) &=& \neg\exists((\Phi\land\neg\Psi)\ctlUntil(\neg\Phi\land\neg\Psi))
+    \end{eqnarray*}
+  \end{block}
+\end{frame}
+
 \begin{frame}[fragile]
   \frametitle{Formula example}
   \begin{block}{Formula}
