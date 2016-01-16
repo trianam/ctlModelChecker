@@ -1,4 +1,9 @@
 class Syntax(object):
+    """
+    Simple container for all the keywords for the syntax of the
+    configuration files.
+    """
+    
     _true         = 'true'
     _ap           = 'ap'
     _land         = '&'

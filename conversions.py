@@ -2,6 +2,15 @@ import networkx as nx
 import syntax
 
 class Conversions(object):
+    """
+    Is the class that implements all the trees (acyclic graphs in
+    reality) used for the conversions of non ENF CTL formulas. When is
+    constructed it populates four dictionaries containing for each
+    formula to convert: the trees of the converted formula;
+    the roots of that trees; the special nodes for the first sons of
+    the original formula; the special nodes for the seconds sons of
+    the original formula.
+    """
     def __init__(self):
         self._syntax = syntax.Syntax()
 
@@ -35,9 +44,11 @@ class Conversions(object):
         return self._psis
     
     def _createEqualTree(self):
+        """
+        Tree for converting 'phi = psi' in 
+        '!(!(phi & psi) & !(!phi & !psi))'.
+        """
         tree = nx.DiGraph()
-
-        #!(!(a&b) & !(!a&!b))
 
         #add big not
         nodeNot1 = nx.utils.misc.generate_unique_node()
@@ -94,9 +105,12 @@ class Conversions(object):
         return (tree, nodeNot1, nodePhi, nodePsi)
         
     def _createImpliesTree(self):
+        """
+        Tree for converting 'phi -> psi' in
+        '!(phi & !psi)'.
+        """
+        
         tree = nx.DiGraph()
-
-        #not(phi and not psi)
 
         #add big not
         nodeNot1 = nx.utils.misc.generate_unique_node()
@@ -126,9 +140,12 @@ class Conversions(object):
         return (tree, nodeNot1, nodePhi, nodePsi)
 
     def _createOrTree(self):
+        """
+        Tree for converting 'phi | psi' in
+        '!(!phi & !psi)'.
+        """
+        
         tree = nx.DiGraph()
-
-        #de morgan
         
         #add big not
         nodeNot1 = nx.utils.misc.generate_unique_node()
@@ -164,9 +181,12 @@ class Conversions(object):
 
         
     def _createExEventuallyTree(self):
+        """
+        Tree for converting 'EF phi' in
+        'E(true U phi)'.
+        """
+        
         tree = nx.DiGraph()
-
-        #add exists true until phi
 
         #add exists until
         nodeUntil = nx.utils.misc.generate_unique_node()
@@ -186,9 +206,12 @@ class Conversions(object):
         return (tree, nodeUntil, nodePhi)
 
     def _createFaNextTree(self):
+        """
+        Tree for converting 'AX phi' in
+        '!EX(!phi)'.
+        """
+        
         tree = nx.DiGraph()
-
-        #add not Exists next not phi
 
         #add outer not
         nodeNot1 = nx.utils.misc.generate_unique_node()
@@ -213,6 +236,11 @@ class Conversions(object):
         return (tree, nodeNot1, nodePhi)
 
     def _createFaUntilTree(self):
+        """
+        Tree for converting 'A(phi U psi)' in 
+        '!E(!phi U (!phi & !psi)) & !EG(!psi)'.
+        """
+        
         tree = nx.DiGraph()
 
         #add a lot of states
@@ -282,9 +310,12 @@ class Conversions(object):
         return (tree, nodeAnd1, nodePhi, nodePsi)
     
     def _createFaAlwaysTree(self):
+        """
+        Tree for converting 'AG phi' in
+        '!E(true U (! phi))'.
+        """
+        
         tree = nx.DiGraph()
-
-        #add not exists true until not phi
 
         #add outer not
         nodeNot1 = nx.utils.misc.generate_unique_node()
@@ -314,9 +345,12 @@ class Conversions(object):
         return (tree, nodeNot1, nodePhi)
 
     def _createFaEventuallyTree(self):
+        """
+        Tree for converting 'AF phi' in 
+        '!EG(!phi)'.
+        """
+        
         tree = nx.DiGraph()
-
-        #add not Exists always not phi
 
         #add outer not
         nodeNot1 = nx.utils.misc.generate_unique_node()
@@ -341,9 +375,12 @@ class Conversions(object):
         return (tree, nodeNot1, nodePhi)
 
     def _createExistsWeakUntilTree(self):
+        """
+        Tree for converting 'E(phi W psi)' in 
+        '!A((phi & !psi) U (!phi & !psi))'.
+        """
+        
         tree = nx.DiGraph()
-
-        #!((a&!b) AU (!a&!b))
 
         #add big not
         nodeNot1 = nx.utils.misc.generate_unique_node()
@@ -395,9 +432,12 @@ class Conversions(object):
         return (tree, nodeNot1, nodePhi, nodePsi)
         
     def _createForallWeakUntilTree(self):
+        """
+        Tree for converting 'A(phi W psi)' in 
+        '!E((phi & !psi) U (!phi & !psi))'.
+        """
+        
         tree = nx.DiGraph()
-
-        #!((a&!b) EU (!a&!b))
 
         #add big not
         nodeNot1 = nx.utils.misc.generate_unique_node()
@@ -448,4 +488,3 @@ class Conversions(object):
 
         return (tree, nodeNot1, nodePhi, nodePsi)
         
-    

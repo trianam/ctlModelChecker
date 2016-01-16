@@ -2,6 +2,11 @@ import conversions
 import syntax
 
 class CtlChecker:
+    """
+    Main class, used for starting the computation of the satisfation
+    set and for model check a CTL formula with the linked transition
+    system. In the costructor is passed the linked transition system.
+    """
     def __init__(self, ts):
         self._syntax = syntax.Syntax()
         self._conv = conversions.Conversions()
@@ -28,29 +33,49 @@ class CtlChecker:
             self._syntax.phiNode       :  self._satPhi,
         }
 
-    def _satTrue(self, tree, root):
+    def _satTrue(self, tree, currNode):
+        """
+        Return satisfation set for 'true', that is all the nodes of
+        the transition system.
+        """
         return set(self._ts.graph.nodes())
 
-    def _satAp(self, tree, root):
+    def _satAp(self, tree, currNode):
+        """
+        Return satisfation set for an atomic proposition, that is all
+        the nodes of the transition system that contain that atom.
+        """
         retSet = set()
         for stato,att in self._ts.graph.nodes(data=True):
-            if tree.node[root]['val'] in att['att']:
+            if tree.node[currNode]['val'] in att['att']:
                retSet.add(stato)
 
         return retSet
 
-    def _satAnd(self, tree, root):
-        rootA = tree.successors(root)[0]
-        rootB = tree.successors(root)[1]
+    def _satAnd(self, tree, currNode):
+        """
+        Return satisfation set for 'phi and psi', that is the
+        intersection of the satisfation sets of phi and psi.
+        """
+        sonA = tree.successors(currNode)[0]
+        sonB = tree.successors(currNode)[1]
         
-        return self._sat(tree, rootA).intersection(self._sat(tree, rootB))
+        return self._sat(tree, sonA).intersection(self._sat(tree, sonB))
 
-    def _satNot(self, tree, root):
-        return set(self._ts.graph.nodes()).difference(self._sat(tree, tree.successors(root)[0]))
+    def _satNot(self, tree, currNode):
+        """
+        Return satisfation set for 'not phi', that is the complement
+        of the satisfation set of phi.
+        """
+        return set(self._ts.graph.nodes()).difference(self._sat(tree, tree.successors(currNode)[0]))
 
-    def _satExNext(self, tree, root):
+    def _satExNext(self, tree, currNode):
+        """
+        Return satisfation set for 'EX phi', that is the set of nodes that
+        have a successor that satisfy phi.
+        """
         retSet = set()
-        satPhi = self._sat(tree, tree.successors(root)[0])
+        satPhi = self._sat(tree, tree.successors(currNode)[0])
 
         for stato in self._ts.graph.nodes():
             if set(self._ts.graph.successors(stato)).intersection(satPhi): #true if not empty
@@ -58,24 +83,40 @@ class CtlChecker:
 
         return retSet
 
-    def _satExUntil(self, tree, root):
-        leftSon = [x for x in tree[root] if tree[root][x]['son'] == self._syntax.leftSon][0]
-        rightSon = [x for x in tree[root] if tree[root][x]['son'] == self._syntax.rightSon][0]
-        
+    def _satExUntil(self, tree, currNode):
+        """
+        Return satisfation set for 'E(phi U psi)', that is the set of nodes that
+        have a track that satisfy phi ended by a state that satisfy
+        psi. This set is calculated going backward starting from the
+        states that satisfy psi, adding the states that satisfy phi
+        and have an edge to the already found states.
+        """
+        leftSon = [x for x in tree[currNode] if tree[currNode][x]['son'] == self._syntax.leftSon][0]
+        rightSon = [x for x in tree[currNode] if tree[currNode][x]['son'] == self._syntax.rightSon][0]
+
+        S = self._sat(tree, leftSon)
         E = self._sat(tree, rightSon)
         T = E.copy()
 
         while E: #while not empty
             r = E.pop()
             for s in self._ts.graph.predecessors(r):
-                if s in self._sat(tree, leftSon).difference(T):
+                if s in S.difference(T):
                     E.add(s)
                     T.add(s)
         return T
 
 
-    def _satExAlways(self, tree, root):
-        T = self._sat(tree, tree.successors(root)[0])
+    def _satExAlways(self, tree, currNode):
+        """
+        Return satisfation set for 'EG phi', that is the set of nodes
+        that have a track that satisfy always phi. This set is
+        calculated using counters that start with the numbers of
+        neighbours for each state that satisfy phi, and then remove a
+        state from the set only if every neighbour don't satisfy phi.
+        """
+        
+        T = self._sat(tree, tree.successors(currNode)[0])
         E = set(self._ts.graph.nodes()).difference(T)
         count = dict()
         for s in T:
@@ -92,42 +133,80 @@ class CtlChecker:
 
         return T
 
-    def _satConversionOneSon(self, tree, root):
-        form = tree.node[root]['form']
-        son = tree.successors(root)[0]
+    def _satConversionOneSon(self, tree, currNode):
+        """
+        Return satisfation set for every conversion tree that has only
+        one son phi. That is calculated saving the satisfation set of
+        phi in a special node of the conversion tree before calling
+        the calculus.
+        """
+        form = tree.node[currNode]['form']
+        son = tree.successors(currNode)[0]
         
         self._conv.trees[form].node[self._conv.phis[form]]['sat'] = self._sat(tree, son)
         return self._sat(self._conv.trees[form], self._conv.roots[form])
 
-    def _satConversionTwoSons(self, tree, root):
-        form = tree.node[root]['form']
-        leftSon = tree.successors(root)[0]
-        rightSon = tree.successors(root)[1]
+    def _satConversionTwoSons(self, tree, currNode):
+        """
+        Return satisfation set for every conversion tree that has two
+        sons phi and psi. That is calculated saving the satisfation
+        sets of phi and psi in special nodes of the conversion tree
+        before calling the calculus.
+        """
+        form = tree.node[currNode]['form']
+        sonA = tree.successors(currNode)[0]
+        sonB = tree.successors(currNode)[1]
+        
+        self._conv.trees[form].node[self._conv.phis[form]]['sat'] = self._sat(tree, sonA)
+        self._conv.trees[form].node[self._conv.psis[form]]['sat'] = self._sat(tree, sonB)
+        return self._sat(self._conv.trees[form], self._conv.roots[form])
+
+    def _satConversionTwoSonsOrdered(self, tree, currNode):
+        """
+        Return satisfation set for every conversion tree that has two
+        sons phi and psi whit a proper order. That is calculated
+        saving the satisfation sets of phi and psi in special nodes of
+        the conversion tree before calling the calculus.
+        """
+        form = tree.node[currNode]['form']
+        leftSon = [x for x in tree[currNode] if tree[currNode][x]['son'] == self._syntax.leftSon][0]
+        rightSon = [x for x in tree[currNode] if tree[currNode][x]['son'] == self._syntax.rightSon][0]
         
         self._conv.trees[form].node[self._conv.phis[form]]['sat'] = self._sat(tree, leftSon)
         self._conv.trees[form].node[self._conv.psis[form]]['sat'] = self._sat(tree, rightSon)
         return self._sat(self._conv.trees[form], self._conv.roots[form])
 
-    def _satConversionTwoSonsOrdered(self, tree, root):
-        form = tree.node[root]['form']
-        leftSon = [x for x in tree[root] if tree[root][x]['son'] == self._syntax.leftSon][0]
-        rightSon = [x for x in tree[root] if tree[root][x]['son'] == self._syntax.rightSon][0]
+    def _satPhi(self, tree, currNode):
+        """
+        Return satisfation set for the special node of the conversion
+        tree. Basically returns only the previously saved content.
+        """
+        return tree.node[currNode]['sat']
         
-        self._conv.trees[form].node[self._conv.phis[form]]['sat'] = self._sat(tree, leftSon)
-        self._conv.trees[form].node[self._conv.psis[form]]['sat'] = self._sat(tree, rightSon)
-        return self._sat(self._conv.trees[form], self._conv.roots[form])
+    def _sat(self, tree, currNode):
+        """
+        The generic function for the calculus of the satisfaction set
+        of a formula. It uses a dictionary for calling the right
+        function for the type of formula.
+        """
+        if (tree.node[currNode]['form'] in self._callDic.keys()) :
+            return self._callDic[tree.node[currNode]['form']](tree, currNode)
 
-    def _satPhi(self, tree, root):
-        return tree.node[root]['sat']
-        
-    def _sat(self, tree, root):
-        if (tree.node[root]['form'] in self._callDic.keys()) :
-            return self._callDic[tree.node[root]['form']](tree, root)
+    def sat(self, phi):
+        """
+        The function that compute the satisfaction set of a formula
+        and is callable by outside the class. Basically it calls _sat
+        initializing the current node with the root of the formula.
+        """
+        return self._sat(phi.graph.copy(), [s for s,a in phi.graph.nodes(data=True) if a['root'] ==True][0])
 
     def check(self, phi):
-        sats = self._sat(phi.graph.copy(), [s for s,a in phi.graph.nodes(data=True) if a['root'] ==True][0])
+        """
+        The function that do the model checking. It check if all the
+        initial states of the transition system are contained inside
+        the calculated satisfation set.
+        """
+        sats = self.sat(phi)
         initials = set([s for s,a in self._ts.graph.nodes(data=True) if a['initial'] ==True])
         return initials.issubset(sats)
 
-    def sat(self, phi):
-        return (self._sat(phi.graph.copy(), [s for s,a in phi.graph.nodes(data=True) if a['root'] ==True][0]))
