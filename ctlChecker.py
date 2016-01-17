@@ -5,12 +5,17 @@ class CtlChecker:
     """
     Main class, used for starting the computation of the satisfation
     set and for model check a CTL formula with the linked transition
-    system. In the costructor is passed the linked transition system.
+    system.
     """
-    def __init__(self, ts):
+    def __init__(self, transitionSystem):
+        """
+        A ctlChecker is linked to a certain transition system. When
+        you build a CtlChecker you need to pass a TransitionSystem to
+        it.
+        """
         self._syntax = syntax.Syntax()
         self._conv = conversions.Conversions()
-        self._ts = ts
+        self._ts = transitionSystem
         
         self._callDic = {
             self._syntax.true          :  self._satTrue,
@@ -192,21 +197,21 @@ class CtlChecker:
         if (tree.node[currNode]['form'] in self._callDic.keys()) :
             return self._callDic[tree.node[currNode]['form']](tree, currNode)
 
-    def sat(self, phi):
+    def sat(self, ctlFormule):
         """
         The function that compute the satisfaction set of a formula
         and is callable by outside the class. Basically it calls _sat
         initializing the current node with the root of the formula.
         """
-        return self._sat(phi.graph.copy(), [s for s,a in phi.graph.nodes(data=True) if a['root'] ==True][0])
+        return self._sat(ctlFormule.graph.copy(), [s for s,a in ctlFormule.graph.nodes(data=True) if a['root'] ==True][0])
 
-    def check(self, phi):
+    def check(self, ctlFormule):
         """
         The function that do the model checking. It check if all the
         initial states of the transition system are contained inside
         the calculated satisfation set.
         """
-        sats = self.sat(phi)
+        sats = self.sat(ctlFormule)
         initials = set([s for s,a in self._ts.graph.nodes(data=True) if a['initial'] ==True])
         return initials.issubset(sats)
 

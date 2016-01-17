@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import syntax
 
-class Ts:
+class TransitionSystem:
     """
     Class that contains the graph for a transition system parsed from
     a configuration file passed during costruction.

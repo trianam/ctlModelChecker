@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import syntax
 
-class Formule(object):
+class CtlFormule(object):
     """
     Class that contains the tree for a CTL formula parsed from a
     configuration file passed during costruction.
