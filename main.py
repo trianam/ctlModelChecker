@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import transitionSystem as ts
 import ctlFormule as frm
