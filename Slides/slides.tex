@@ -388,15 +388,72 @@
 \begin{frame}
   \frametitle{Complessit\`a rispetto a \acf{LTL}}
   \begin{itemize}
-  \item \ac{HP} \`e \alert{NP-Completo}
-  \item possibile descrivere \ac{TS} e una formula \alert{\acs{LTL}} di
+  \item[1.] \ac{HP} \`e \alert{NP-Completo}
+    \begin{itemize}
+    \item Trovare un percorso in un certo grafo $G$ che passa
+      esattamente una volta per ogni nodo
+    \end{itemize}
+  \item[2a.] \`e possibile descrivere $TS_G$ e una formula
+    \alert{\acs{LTL}} $\Phi_{LTL}$ di
     lunghezza \alert{polinomiale} nel numero di stati del grafo del problema
-    tali che $TS\not\models\neg\Phi_{ltl}$
-  \item il model checking di \ac{LTL} ha complessit\`a esponenziale in $|\Phi|$
-  \item \`e possibile descrivere un \ac{TS} e una formula
-    \alert{\ac{CTL}} di lunghezza \alert{esponenziale} nel numero di
-    stati del grafo \dots
+    \begin{itemize}
+    \item  tali che
+      $TS_G\not\models\Phi_{LTL}\quad\Leftrightarrow\quad G$
+      contiene un percorso hamiltoniano
+    \end{itemize}
+  \item[2b.] il model checking di \ac{LTL} ha complessit\`a \alert{esponenziale} in $|\Phi|$
+  \item[3a.] \`e possibile descrivere un $TS_G$ e una formula
+    \alert{\ac{CTL}} $\Phi_{CTL}$ di lunghezza \alert{esponenziale} nel numero di
+    stati del grafo
+    \begin{itemize}
+    \item  tali che
+      $TS_G\not\models\neg\Phi_{CTL}\quad\Leftrightarrow\quad G$
+      contiene un percorso hamiltoniano
+    \end{itemize}
+  \item[3b.] il model checking di \ac{CTL} ha complessit\`a \alert{lineare} in $|\Phi|$
+  \item[4.] se $P\neq NP$ \alert{non} esiste una formula $\Phi_{CTL}$ equivalente
+    a $\Phi_{LTL}$ e \alert{non} esponenzialmente pi\`u lunga.
   \end{itemize}
+\end{frame}
+
+\begin{frame}{fragile}
+  \frametitle{Implementazione $TS_G$, $\Phi_{LTL}$, $\Phi_{CTL}$}
+  \begin{center}
+    \begin{tikzpicture}
+      \clip (-1.7,-1.35) rectangle (5.7,1.75);
+
+      \coordinate(i1) at (-1,1.8);
+      \coordinate(i2) at (1.9,1);
+      \coordinate(i3) at (2.1,1);
+      \coordinate(i4) at (5,1.8);
+      \node(s1) at (-1,1) [oval, label={[label distance=-1.8mm]110:$\upsilon_1$}] {$v_1$};
+      \node(s2) at (1,1) [oval, label={[label distance=-1.8mm]110:$\upsilon_2$}] {$v_2$};
+      \node(sb) at (2,-0.5) [oval, label={[label distance=-1.8mm]190:$\beta$}] {$b$};
+      \node(s3) at (3,1) [oval, label={[label distance=-1.8mm]80:$\upsilon_3$}] {$v_3$};
+      \node(s4) at (5,1) [oval, label={[label distance=-1.8mm]80:$\upsilon_4$}] {$v_4$};
+      \draw[arrow] (i1) to (s1);
+      \draw[arrow] (i2) to (s2);
+      \draw[arrow] (i3) to (s3);
+      \draw[arrow] (i4) to (s4);
+      \draw[arrow] (s1) to[bend right] (sb);
+      \draw[arrow] (s1) to (s2);
+      \draw[arrow] (s1) to[bend left] (s3);
+      \draw[arrow] (s2) to (sb);
+      \draw[arrow] (s2) to[bend left] (s4);
+      \draw[arrow] (s3) to (sb);
+      \draw[arrow] (s3) to (s4);
+      \draw[arrow] (s3) to[bend left] (s1);
+      \draw[arrow] (s4) to[bend left] (sb);
+      \draw[arrow] (s4) to[bend left] (s1);
+      \draw[arrow] (sb) to[loop below] (sb);
+    \end{tikzpicture}
+  \end{center}
+    \begin{eqnarray*}
+      \Phi_{LTL}&=&\neg\landatory_{\upsilon\in
+        V}(\ctlEventually\upsilon\land\ctlAlways(\upsilon\rightarrow\ctlNext\ctlAlways\neg\upsilon))\\
+      \Phi_{CTL}&=&\lorratory_{(i_1,\dots,i_n)}\Psi(\upsilon_{i_1},\dots,\upsilon_{i_n})\quad\alert{\in\bigO(n!)}
+    \end{eqnarray*}
+    dove $n$ \`e il numero di stati, e $\Psi(\upsilon_i)=\upsilon_i;\quad\Psi(\upsilon_{i_1},\upsilon_{i_2},\dots,\upsilon_{i_n})=\upsilon_{i_1}\land\exists\ctlNext\Psi(\upsilon_{i_2},\dots,\upsilon_{i_n})$.
 \end{frame}
 
 \begin{frame}
