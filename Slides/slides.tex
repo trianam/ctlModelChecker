@@ -39,6 +39,8 @@
 \newacro{ENF}{Existential Normal Form}
 \newacro{TS}{Transition System}
 \newacro{LTS}{Labelled Transition System}
+\newacro{LTL}{Linear Temporal Logic}
+\newacro{HP}{Problema Hamiltoniano}
 
 %\acrodefplural{VD}[VDs]{Voronoi Diagrams}
 
@@ -192,120 +194,53 @@
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Implementazione $Sat(\cdot)$}
-  \begin{pblock}
-def __init__(self, ts):
-    self._callDic = {
-        'true':self._satTrue,
-        'ap':self._satAp,
-        'and':self._satAnd,
-        'not':self._satNot,
-        'next':self._satNext,
-        'until':self._satUntil,
-        'always':self._satAlways,
-    }
-
-    self._ts = ts
-  \end{pblock}
-  \begin{pblock}
-def sat(self, phi):
-    return (self._sat(phi, [s for s,a in phi.graph.nodes(data=True) if a['root'] ==True][0]))    
-  \end{pblock}
-  \begin{pblock}
-def _sat(self, phi, nodo):
-    if (phi.graph.node[nodo]['form'] in self._callDic.keys()) :
-        return self._callDic[phi.graph.node[nodo]['form']](phi, nodo)    
-  \end{pblock}
+  \frametitle{Implementazione costruttore}
+  %__init__
+  \pfilePart{10}{39}{../ctlChecker.py}
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Implementazione $Sat(\cdot)$}
-  \begin{pblock}
-def _satTrue(self, phi, nodo):
-    return set(self._lts.graph.nodes())
-  \end{pblock}
-
-  \begin{pblock}
-def _satAp(self, phi, nodo):
-    retSet = set()
-    for stato,att in self._lts.graph.nodes(data=True):
-        if phi.graph.node[nodo]['val'] in att['att']:
-           retSet.add(stato)
-
-    return retSet    
-  \end{pblock}
-
-  \begin{pblock}
-def _satAnd(self, phi, nodo):
-    return self._sat(phi, phi.graph.successors(nodo)[0]).intersection(self._sat(phi, phi.graph.successors(nodo)[1]))
-  \end{pblock}
-
-  \begin{pblock}
-def _satNot(self, phi, nodo):
-    return set(self._lts.graph.nodes()).difference(self._sat(phi, phi.graph.successors(nodo)[0]))
-  \end{pblock}
+  %sat
+  \pfilePart{200}{206}{../ctlChecker.py}  
+  %_sat
+  \pfilePart{191}{198}{../ctlChecker.py}  
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Implementazione $Sat(\cdot)$}
-  \begin{pblock}
-def _satNext(self, phi, nodo):
-    retSet = set()
-    satPhi = self._sat(phi, phi.graph.successors(nodo)[0])
-
-    for stato in self._lts.graph.nodes():
-        if set(self._lts.graph.successors(stato)).intersection(satPhi): #true if not empty
-            retSet.add(stato)
-
-    return retSet
-  \end{pblock}
-
-  \begin{pblock}
-def _satUntil(self, phi, nodo):
-    E = self._sat(phi, phi.graph.successors(nodo)[1])
-    T = E.copy()
-
-    while E: #while not empty
-        r = E.pop()
-        for s in self._lts.graph.predecessors(r):
-            if s in self._sat(phi, phi.graph.successors(nodo)[0]).difference(T):
-                E.add(s)
-                T.add(s)
-    return T
-  \end{pblock}
+  %_satTrue
+  \pfilePart{41}{46}{../ctlChecker.py}  
+  %_satAp
+  \pfilePart{48}{58}{../ctlChecker.py}  
+  %_satAnd
+  \pfilePart{60}{68}{../ctlChecker.py}  
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Implementazione $Sat(\cdot)$}
-  \begin{pblock}
-def _satAlways(self, phi, nodo):
-    T = self._sat(phi, phi.graph.successors(nodo)[0])
-    E = set(self._lts.graph.nodes()).difference(T)
-    count = dict()
-    for s in T:
-        count[s] = len(self._lts.graph.successors(s))
+  %_satNot
+  \pfilePart{70}{75}{../ctlChecker.py}  
+  %_satExNext
+  \pfilePart{77}{89}{../ctlChecker.py}  
+\end{frame}
 
-    while E:
-        r = E.pop()
-        for s in self._lts.graph.predecessors(r):
-            if s in T:
-                count[s] = count[s]-1
-                if count[s] == 0:
-                    T.remove(s)
-                    E.add(s)
+\begin{frame}[fragile]
+  \frametitle{Implementazione $Sat(\cdot)$}
+  %_satExUntil
+  \pfilePart{91}{112}{../ctlChecker.py}  
+\end{frame}
 
-    return 
-  \end{pblock}
+\begin{frame}[fragile]
+  \frametitle{Implementazione $Sat(\cdot)$}
+  %_satExAlways
+  \pfilePart{115}{139}{../ctlChecker.py}  
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Implementazione $TS\models\Phi$}
-  \begin{pblock}
-def check(self, phi):
-    sats = self._sat(phi, [s for s,a in phi.graph.nodes(data=True) if a['root'] ==True][0])
-    initials = set([s for s,a in self._ts.graph.nodes(data=True) if a['initial'] ==True])
-    return initials.issubset(sats)    
-  \end{pblock}
+  %check
+  \pfilePart{208}{216}{../ctlChecker.py}  
   \begin{center}
     Ma non finisce qui \dots    
   \end{center}
@@ -341,6 +276,32 @@ def check(self, phi):
     \end{itemize}
   \item \alert{Calcolo} di $Sat(\exists\ctlUntil)$ su albero di conversione
   \end{enumerate}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Complessit\`a \ac{CTL} Model Checking}
+  \begin{block}{Algoritmi di base $Sat(\cdot)$, formula \ac{ENF}}
+    $$
+    \bigO((N+K)\cdot|\Phi|)
+    $$
+    \begin{itemize}
+    \item $N$ numero di \alert{stati} del \ac{TS}
+    \item $K$ numero di \alert{transizioni} del \ac{TS}
+    \item $|\Phi|$ \alert{lunghezza} della formula $\Phi$
+    \end{itemize}
+  \end{block}
+  \begin{block}{Complessit\`a $TS\models\Phi$}
+    \begin{itemize}
+    \item La trasformazione da formula \ac{CTL} generica a \ac{CTL}
+      \ac{ENF} sarebbe \alert{esponenziale}, per\`o:
+      \begin{itemize}
+      \item Esistono algoritmi \alert{lineari} analoghi a quelli per formule \ac{ENF}
+      \item Implementata conversione/calcolo \alert{lineare}
+        di $Sat(\cdot)$ per formule generiche
+      \end{itemize}
+    \item La complessit\`a totale rimane \alert{invariata}
+    \end{itemize}
+  \end{block}
 \end{frame}
 
 \begin{frame}
@@ -425,11 +386,24 @@ def check(self, phi):
 \end{frame}
 
 \begin{frame}
+  \frametitle{Complessit\`a rispetto a \acf{LTL}}
+  \begin{itemize}
+  \item \ac{HP} \`e \alert{NP-Completo}
+  \item possibile descrivere \ac{TS} e una formula \alert{\acs{LTL}} di
+    lunghezza \alert{polinomiale} nel numero di stati del grafo del problema
+    tali che $TS\not\models\neg\Phi_{ltl}$
+  \item il model checking di \ac{LTL} ha complessit\`a esponenziale in $|\Phi|$
+  \item \`e possibile descrivere un \ac{TS} e una formula
+    \alert{\ac{CTL}} di lunghezza \alert{esponenziale} nel numero di
+    stati del grafo \dots
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
   \begin{center}
 	\textbf{\calligra\Huge The End.}\\
   \includegraphics[width=5cm]{img/ornament.eps}\\[1cm]
-	\pause
-	{\huge\calligra Questions?\pause{} Thank you!}
+	{\huge\calligra Questions? Thank you!}
   \end{center}
 \end{frame}
 

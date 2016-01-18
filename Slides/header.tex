@@ -120,8 +120,8 @@ shadow, minimum width=\transH, minimum height=\transW]
    firstnumber=1,
    numberfirstline=true,
    numberstyle=\tiny\color{black!50},
-   xleftmargin=1.75em,
-   framexleftmargin=2.1em,
+   xleftmargin=2.75em,
+   framexleftmargin=3.1em,
    % rulesepcolor=\color{gray},
    rulecolor=\color{black}
    % linewidth=8cm,
@@ -147,6 +147,10 @@ shadow, minimum width=\transH, minimum height=\transW]
 
 \newcommand{\pfile}[2][]{
   \lstinputlisting[style=customPython, title={\texttt{\detokenize{#2}}}, #1]{#2}
+}
+
+\newcommand{\pfilePart}[3]{
+  \lstinputlisting[style=customPython, firstnumber=#1, firstline=#1,lastline=#2]{#3}
 }
 
 \newcommand{\pp}[2][]{\lstinline[style=customInlinePython,#1]`#2`}
