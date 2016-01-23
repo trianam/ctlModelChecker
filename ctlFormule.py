@@ -18,7 +18,8 @@ class CtlFormule(object):
         (_syntax.lnot, 1, pp.opAssoc.RIGHT),
         (pp.oneOf(_syntax.land+' '+_syntax.lor), 2, pp.opAssoc.LEFT),
         (pp.oneOf(_syntax.implies+' '+_syntax.equals), 2, pp.opAssoc.LEFT),
-        (pp.oneOf(_syntax.exNext+' '+_syntax.exUntil+' '+_syntax.exAlways+' '+_syntax.exEventually+' '+_syntax.faNext+' '+_syntax.faUntil+' '+_syntax.faAlways+' '+_syntax.faEventually+' '+_syntax.exWeakUntil+' '+_syntax.faWeakUntil), 2, pp.opAssoc.LEFT)])
+        (pp.oneOf(_syntax.exNext+' '+_syntax.exAlways+' '+_syntax.exEventually+' '+_syntax.faNext+' '+_syntax.faAlways+' '+_syntax.faEventually), 1, pp.opAssoc.RIGHT),
+        (pp.oneOf(_syntax.exUntil+' '+_syntax.faUntil+' '+_syntax.exWeakUntil+' '+_syntax.faWeakUntil), 2, pp.opAssoc.LEFT)])
 
     
     def __init__(self, formulaString):
