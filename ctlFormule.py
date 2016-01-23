@@ -22,9 +22,12 @@ class CtlFormule(object):
         (pp.oneOf(_syntax.exUntil+' '+_syntax.faUntil+' '+_syntax.exWeakUntil+' '+_syntax.faWeakUntil), 2, pp.opAssoc.LEFT)])
 
     
-    def __init__(self, formulaString):
+    def __init__(self, string, loadFromFile=False):
         self._graph = nx.DiGraph()
-        self._parseNode(self._form.parseString(formulaString)[0], isRoot=True)
+        if loadFromFile:
+            self._loadFromFile(string)
+        else:
+            self._parseNode(self._form.parseString(string)[0], isRoot=True)
         
     def _parseNode(self, nodeList, isRoot=False):
         newId = nx.utils.misc.generate_unique_node()
@@ -43,6 +46,30 @@ class CtlFormule(object):
             self._graph.add_edge(newId, self._parseNode(nodeList[2]), son=self._syntax.rightSon)
 
         return newId
+
+    def _loadFromFile(self, filename):
+        f = open(filename, 'r')
+        nodesPart = True
+        firstLine = True
+        for line in f:
+            fields = line.split('//')[0].split()
+            if nodesPart and len(fields) == 0:
+                nodesPart = False
+                continue
+
+            if nodesPart:
+                if (fields[1] == self._syntax.ap):
+                    self._graph.add_node(fields[0], root=firstLine, form=fields[1], val=fields[2])
+                else:
+                    self._graph.add_node(fields[0], root=firstLine, form=fields[1])
+                firstLine = False
+
+            else:
+                if len(fields) == 3:
+                    self._graph.add_edge(fields[0], fields[1], son=fields[2])
+                else:
+                    self._graph.add_edge(fields[0], fields[1])
+
     
     def draw(self):
         labels=dict((n,{'l':n,'d':d['form']}) for n,d in self._graph.nodes(data=True))
