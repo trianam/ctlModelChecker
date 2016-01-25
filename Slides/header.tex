@@ -22,6 +22,7 @@
 \usepackage{acronym}
 \usepackage{array}
 \usepackage{amsmath}
+\usepackage{appendixnumberbeamer}
 %\usepackage{latexsym}
 \usepackage{tikz}
 \usetikzlibrary{shapes, chains, scopes, shadows, positioning, arrows,
@@ -48,8 +49,13 @@
 \colorlet{c4}{red!10}
 \colorlet{drawColor}{black!80}
 \colorlet{commentColor}{green!70!black!90}
-\colorlet{codeBgColor}{yellow!50}
+\colorlet{codeBgColor}{yellow!20}
 \colorlet{bashBgColor}{green!50}
+\colorlet{mcI}{yellow!60}
+\colorlet{mcOok}{green!60}
+\colorlet{mcOko}{red!60}
+\colorlet{mcB}{blue!10}
+\colorlet{mcB2}{blue}
 
 \tikzset{onslide/.code args={<#1>#2}{%
   \only<#1>{\pgfkeysalso{#2}} % \pgfkeysalso doesn't change the path
@@ -154,11 +160,11 @@ shadow, minimum width=\transH, minimum height=\transW]
   \lstinputlisting[style=customPython, firstnumber=#1, firstline=#1,lastline=#2]{#3}
 }
 
-\newcommand{\pp}[2][]{\lstinline[style=customInlinePython,#1]`#2`}
-  %\colorbox{codeBgColor}{
-  %  \lstinline[style=customPython,#1]`#2`
-  %}
-%}
+\newcommand{\pp}[2][]{%\lstinline[style=customInlinePython,#1]`#2`}
+  \colorbox{codeBgColor}{
+    \lstinline[style=customInlinePython,#1]`#2`
+  }
+}
 
 \graphicspath{{img/}}
 %\lstset{inputpath=../cSrc/}
