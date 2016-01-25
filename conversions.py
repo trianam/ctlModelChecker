@@ -27,8 +27,8 @@ class Conversions(object):
         self._trees[self._syntax.faUntil], self._roots[self._syntax.faUntil], self._phis[self._syntax.faUntil], self._psis[self._syntax.faUntil] = self._createFaUntilTree()
         self._trees[self._syntax.faAlways], self._roots[self._syntax.faAlways], self._phis[self._syntax.faAlways] = self._createFaAlwaysTree()
         self._trees[self._syntax.faEventually], self._roots[self._syntax.faEventually], self._phis[self._syntax.faEventually] = self._createFaEventuallyTree()
-        self._trees[self._syntax.exWeakUntil], self._roots[self._syntax.exWeakUntil], self._phis[self._syntax.exWeakUntil], self._psis[self._syntax.exWeakUntil] = self._createExistsWeakUntilTree()
-        self._trees[self._syntax.faWeakUntil], self._roots[self._syntax.faWeakUntil], self._phis[self._syntax.faWeakUntil], self._psis[self._syntax.faWeakUntil] = self._createForallWeakUntilTree()
+        self._trees[self._syntax.exWeakUntil], self._roots[self._syntax.exWeakUntil], self._phis[self._syntax.exWeakUntil], self._psis[self._syntax.exWeakUntil] = self._createExWeakUntilTree()
+        self._trees[self._syntax.faWeakUntil], self._roots[self._syntax.faWeakUntil], self._phis[self._syntax.faWeakUntil], self._psis[self._syntax.faWeakUntil] = self._createFaWeakUntilTree()
 
     @property
     def trees(self):
@@ -374,7 +374,7 @@ class Conversions(object):
 
         return (tree, nodeNot1, nodePhi)
 
-    def _createExistsWeakUntilTree(self):
+    def _createExWeakUntilTree(self):
         """
         Tree for converting 'E(phi W psi)' in 
         '!(!E(phi U psi) & !EG(phi))'.
@@ -425,7 +425,7 @@ class Conversions(object):
 
         return (tree, nodeNot1, nodePhi, nodePsi)
         
-    def _createForallWeakUntilTree(self):
+    def _createFaWeakUntilTree(self):
         """
         Tree for converting 'A(phi W psi)' in 
         '!E((phi & !psi) U (!phi & !psi))'.
