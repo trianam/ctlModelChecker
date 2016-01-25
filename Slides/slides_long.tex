@@ -1,0 +1,559 @@
+%This work is licensed under the Creative Commons
+%Attribution-ShareAlike 4.0 International License. To view a copy of
+%this license, visit http://creativecommons.org/licenses/by-sa/4.0/ or
+%send a letter to Creative Commons, PO Box 1866, Mountain View, CA
+%94042, USA.
+
+\input{header}
+
+
+\begin{document}
+
+\title[CTL model checking]{\textbf{CTL Model Checking}}
+\date[\today]{\flushright \today}
+%\subtitle{}
+\institute[Uni. Firenze]{
+  \includegraphics[width=5cm]{img/logoUnifiName.eps}
+}
+
+\author[Buracchi M. - Martina S.]{
+  \begin{center}
+    \begin{tabular}{lr}
+      Marco \textsc{Buracchi} & Stefano \textsc{Martina}\\
+      \href{mailto:marco.buracchi1@stud.unifi.it}{marco.buracchi1@stud.unifi.it}&
+      \href{mailto:stefano.martina@stud.unifi.it}{stefano.martina@stud.unifi.it}\\
+    \end{tabular}
+  \end{center}
+}
+
+\titlegraphic{
+  \vspace{-0.5cm}
+  \tiny
+  \href{http://creativecommons.org/licenses/by-sa/4.0/}{\includegraphics[width=1cm]{img/logoCC.png}}
+  This work is licensed under a
+  \href{http://creativecommons.org/licenses/by-sa/4.0/}{Creative
+    Commons Attribution-ShareAlike 4.0 International License}.
+}
+
+\newacro{CTL}{Computation Tree Logic}
+\newacro{ENF}{Existential Normal Form}
+\newacro{TS}{Transition System}
+\newacro{LTS}{Labelled Transition System}
+\newacro{LTL}{Linear Temporal Logic}
+\newacro{HP}{Problema Hamiltoniano}
+
+%\acrodefplural{VD}[VDs]{Voronoi Diagrams}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\section{Introduzione}
+\begin{frame}
+  \frametitle{Model checking}
+    \begin{tikzpicture}
+      \node(req) at (-1,5) [oval, fill=mcI] {Requirements};
+      \node(form) at (-1,3.5) [rect] {Formalizing};
+      \node(prop) at (-1,2) [oval,label={[label distance=-1mm]30:\color{mcB2}\emph{formule \acs{CTL}}}] {Property\\specification};
+      \node(mc) at (2,1) [rect, fill=mcB] {Model checking};
+      \node(sat) at (-2,-1) [oval, fill=mcOok] {Satisfied};
+      \node(vio) at (2,-1) [oval, fill=mcOko] {Violated +\\counterexample};
+      \node(sim) at (6,0.5) [rect] {Simulation};
+      \node(err) at (8,-1) [oval] {Location\\error};
+      \node(sysmod) at (4.5,2) [oval,label={[label distance=-1mm]30:\color{mcB2}\emph{\acl{TS}}}] {System\\model};
+      \node(mod) at (4.5,3.5) [rect] {Modeling};
+      \node(sys) at (4.5,5) [oval, fill=mcI] {System};
+
+      \draw[arrow] (req) to (form);
+      \draw[arrow] (form) to (prop);
+      \draw[arrow] (prop) |- (mc);
+      \draw[arrow] (mc) to (sat);
+      \draw[arrow] (mc) to (vio);
+      \draw[arrow] (vio) to (sim);
+      \draw[arrow] (sim) to (err);
+      \draw[arrow] (sysmod) |- (mc);
+      \draw[arrow] (sysmod) -| (sim);
+      \draw[arrow] (mod) to (sysmod);
+      \draw[arrow] (sys) to (mod);
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\ac{CTL}}
+  \begin{block}{Grammatica}
+   \begin{eqnarray*}
+     \Phi &::=& true|a|\Phi_1\land
+     \Phi_2|\neg\Phi|\exists\varphi|\forall\varphi\\
+     \varphi &::=& \ctlNext\Phi|\Phi_1\ctlUntil\Phi_2
+   \end{eqnarray*}
+  \end{block}
+  \begin{itemize}
+  \item $\Phi$ sono state formula
+  \item $\varphi$ sono path formula
+  \end{itemize}
+  \begin{block}{Operatori derivati}
+    \begin{eqnarray*}
+      \exists\ctlEventually\Phi &=& \exists(true\ctlUntil\Phi)\\
+      \forall\ctlEventually\Phi &=& \forall(true\ctlUntil\Phi)\\
+      \exists\ctlAlways\Phi &=& \neg\forall\ctlEventually\neg\Phi\\
+      \forall\ctlAlways\Phi &=& \neg\exists\ctlEventually\neg\Phi
+    \end{eqnarray*}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\ac{CTL} \ac{ENF}}
+  \begin{block}{Grammatica}
+   \begin{eqnarray*}
+     \Phi &::=& true|a|\Phi_1\land
+     \Phi_2|\neg\Phi|\exists\ctlNext\Phi|\exists(\Phi_1\ctlUntil\Phi_2)|
+     \exists\ctlAlways\Phi
+   \end{eqnarray*}
+  \end{block}
+  \begin{block}{Equivalenze}
+    \begin{eqnarray*}
+      \forall\ctlNext\Phi&\equiv&\neg\exists\ctlNext\neg\Phi\\
+      \forall\ctlEventually\Phi&\equiv&\neg\exists\ctlAlways\neg\Phi\\
+      \forall\ctlAlways\Phi&\equiv&\neg\exists\ctlEventually\neg\Phi=\neg\exists(true\ctlUntil\neg\Phi)
+    \end{eqnarray*}
+  \end{block}
+  \begin{itemize}
+  \item utile anche la formula vista prima: $\exists\ctlEventually\Phi = \exists(true\ctlUntil\Phi)$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Equivalenze non banali}
+  \begin{block}{$\forall$ until}
+    \begin{eqnarray*}
+      \forall(\Phi\ctlUntil\Psi)&\equiv&\neg\exists(\neg\Psi\ctlUntil(\neg\Phi\land\neg\Psi))\land\neg\exists\ctlAlways\neg\Psi
+    \end{eqnarray*}
+  \end{block}
+  \begin{block}{Weak until}
+    \begin{eqnarray*}
+    \exists(\Phi\ctlWeakUntil\Psi) &=&
+    \neg\forall((\Phi\land\neg\Psi)\ctlUntil(\neg\Phi\land\neg\Psi))\\
+    &=&\exists(\Phi\ctlUntil\Psi)\lor\exists\ctlAlways\Phi\\
+    &=&\neg(\neg\exists(\Phi\ctlUntil\Psi)\land\neg\exists\ctlAlways\Phi)\\
+    \forall(\Phi\ctlWeakUntil\Psi) &=& \neg\exists((\Phi\land\neg\Psi)\ctlUntil(\neg\Phi\land\neg\Psi))
+    \end{eqnarray*}
+  \end{block}
+  \begin{itemize}
+  \item Comportano esplosione \alert{esponenziale} della formula
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Formula example}
+  \begin{block}{Formula}
+    \begin{equation*}
+      \Phi=\exists\ctlNext a
+      \land\exists(b\ctlUntil\exists\ctlAlways\neg c)\ \equiv\ \text{\pp{EX(a \& (b EU (EG !c)))}}
+    \end{equation*}    
+  \end{block}
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      \vspace{-1cm}
+      \begin{center}
+        \begin{tikzpicture}[scale=0.8, sibling distance=3cm]
+          \node[oval,label={[label distance=-2mm]110:$f_0$}](and) {$\land$} 
+          child{ node[oval,label={[label distance=-1mm]110:$f_1$}] {$\exists\ctlNext$}
+            child { node[oval,label={[label distance=-2mm]110:$f_3$}] {$a$} }
+          }
+          child{ node[oval,label={[label distance=-2mm]80:$f_2$}] {$\exists\ctlUntil$}
+            child { node[oval,label={[label distance=-2mm]110:$f_4$}] {$b$} }
+            child { node[oval,label={[label distance=-2mm]80:$f_5$}] {$\exists\ctlAlways$}
+              child { node[oval,label={[label distance=-2mm]80:$f_6$}] {$\neg$}
+                child { node[oval,label={[label distance=-2mm]80:$f_7$}] {$c$} }
+              }
+            }
+          };
+        \end{tikzpicture}
+      \end{center}      
+    \end{column}
+    \begin{column}{0.2\textwidth}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \lstinputlisting[style=customConf]{../conf/example-6.22.frm}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\acf{TS}}
+  \begin{block}{Definizione}
+    $TS = $\alert{$(S, Act, \longrightarrow, I, AP, L)$}
+    \begin{itemize}
+    \item $S$ insieme di \alert{stati}
+    \item $Act$ insieme di \alert{azioni} (singola azione per \acs{CTL})
+    \item $\longrightarrow\ $\alert{$\subseteq S\times Act\times S $}
+    \item $I\subseteq S$ insieme di stati \alert{iniziali}
+    \item $AP$ insieme di \alert{proposizioni atomiche}
+    \item $L:$\alert{$S\rightarrow 2^{AP}$} 
+    \end{itemize}
+  \end{block}
+  \begin{center}
+    \begin{tikzpicture}
+      \coordinate(init) at (-1,1);
+      \node(s0) at (0,1) [oval, label={[label distance=-2mm]110:$s_0$}] {$a$};
+      \node(s1) at (3,1) [oval, label={[label distance=-2mm]80:$s_1$}] {$a,b$};
+      \node(s2) at (1.5,-1) [oval, label={[label distance=-2mm]190:$s_2$}] {$b$};
+      \node(s3) at (5.5,1) [oval, label={[label distance=-2mm]110:$s_3$}] {$a$};
+      \draw[arrow] (init) to (s0);
+      \draw[arrow] (s0) to[bend left] (s1);
+      \draw[arrow] (s1) to[bend left] (s0);
+      \draw[arrow] (s0) to (s2);
+      \draw[arrow] (s2) to (s1);
+      \draw[arrow] (s1) to (s3);
+      \draw[arrow] (s3) to[loop right] (s3);
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{fragile}
+  \frametitle{Implementazione \ac{TS}}
+  \begin{center}
+    \begin{tikzpicture}
+      \coordinate(init) at (-1,1);
+      \node(s0) at (0,1) [oval, label={[label distance=-2mm]110:$s_0$}] {$a$};
+      \node(s1) at (3,1) [oval, label={[label distance=-2mm]80:$s_1$}] {$a,b$};
+      \node(s2) at (1.5,-1) [oval, label={[label distance=-2mm]190:$s_2$}] {$b$};
+      \node(s3) at (5.5,1) [oval, label={[label distance=-2mm]110:$s_3$}] {$a$};
+      \draw[arrow] (init) to (s0);
+      \draw[arrow] (s0) to[bend left] (s1);
+      \draw[arrow] (s1) to[bend left] (s0);
+      \draw[arrow] (s0) to (s2);
+      \draw[arrow] (s2) to (s1);
+      \draw[arrow] (s1) to (s3);
+      \draw[arrow] (s3) to[loop right] (s3);
+    \end{tikzpicture}
+  \end{center}
+  \lstinputlisting[style=customConf]{../conf/book6.4.ts}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\acs{CTL} Model Checking}
+  \begin{itemize}
+  \item \alert{Verificare} se $TS\models\Phi$
+    \begin{itemize}
+    \item \alert{calcolare} ricorsivamente $Sat(\Phi)$\\[-7mm]
+      \begin{eqnarray*}
+        Sat(true)&=&S\\
+        Sat(a)&=&\left\{s\in S| a\in L(s)\right\}\qquad,\forall a\in
+        AP\\
+        Sat(\Phi\land\Psi)&=&Sat(\Phi)\cap Sat(\Psi)\\
+        Sat(\neg\Phi)&=&S\setminus Sat(\Phi)\\
+        Sat(\exists\ctlNext\Phi)&=&\left\{s\in S|Post(s)\cap Sat(\Phi)\neq\varnothing\right\}\\
+        Sat(\exists(\Phi\ctlUntil\Psi))&=&\text{il pi\`u piccolo }T\subseteq
+        S\text{ t.c.}\\
+        &&\quad Sat(\Psi)\cup\left\{s\in Sat(\Phi)|Post(s)\cap
+          T\neq\varnothing\right\}\subseteq T\\
+        Sat(\exists\ctlAlways\Phi)&=&\text{il pi\`u grande }T\subseteq
+        S\text{ t.c.}\\
+        &&\quad T\subseteq\left\{s\in Sat(\Phi)|Post(s)\cap
+          T\neq\varnothing\right\}
+      \end{eqnarray*}\\[-4mm]
+      \begin{itemize}
+      \item formule non \acs{ENF} vengono \alert{convertite}
+      \end{itemize}
+    \item $TS\models\Phi \Leftrightarrow I\subseteq Sat(\Phi)$
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Complessit\`a \ac{CTL} Model Checking}
+  \begin{block}{Algoritmi di base $Sat(\cdot)$, formula \ac{ENF}}
+    $$
+    \bigO((N+K)\cdot|\Phi|)
+    $$
+    \begin{itemize}
+    \item $N$ numero di \alert{stati} del \ac{TS}
+    \item $K$ numero di \alert{transizioni} del \ac{TS}
+    \item $|\Phi|$ \alert{lunghezza} della formula $\Phi$
+    \end{itemize}
+  \end{block}
+  \begin{block}{Complessit\`a $TS\models\Phi$}
+    \begin{itemize}
+    \item La trasformazione da formula \ac{CTL} generica a \ac{CTL}
+      \ac{ENF} sarebbe \alert{esponenziale}, per\`o:
+      \begin{itemize}
+      \item Esistono algoritmi \alert{lineari} analoghi a quelli per formule \ac{ENF}
+      \item Implementata conversione/calcolo \alert{lineare}
+        di $Sat(\cdot)$ per formule generiche
+      \end{itemize}
+    \item La complessit\`a totale rimane \alert{invariata}
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Formule non \ac{ENF}}
+  \begin{itemize}
+  \item Alberi di \alert{conversione} generici
+    \begin{itemize}
+    \item Foglie speciali per agganciarci alla formula originale
+    \end{itemize}
+  \end{itemize}
+  \begin{center}
+    \begin{tikzpicture}
+      \node(f0) at (0,2) [oval, label={[label distance=-1mm]110:$f_0$}] {$\exists\ctlEventually$};
+      \node(f1) at (0,0) [oval, label={[label distance=-1mm]110:$f_1$}] {$\Phi_o$};
+
+      \node(ff0) at (4,2) [oval, label={[label distance=-1mm]110:$f_0$}] {$\exists\ctlUntil$};
+      \node(ff1) at (3,0) [oval, label={[label distance=-1mm]110:$f_1$}] {$true$};
+      \node(ff2) at (5,0) [oval, label={[label distance=-1mm]80:$f_2$}] {$\Phi_c$};
+      \draw[bigArrow] (1,1) to (2,1);
+      \draw[arrow] (f0) to (f1);
+      \draw[arrow] (ff0) to (ff1);
+      \draw[arrow] (ff0) to (ff2);
+    \end{tikzpicture}
+  \end{center}
+  \begin{enumerate}
+  \item \alert{Calcolo} di $Sat(\Phi_o)$
+  \item \alert{Salva} risultato in nodo speciale $\Phi_c$
+    \begin{itemize}
+    \item Evita esplosione della formula $\forall(\Phi\ctlUntil\Psi)$
+    \end{itemize}
+  \item \alert{Calcolo} di $Sat(\exists\ctlUntil)$ su albero di conversione
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}
+  \frametitle{$\forall\ctlUntil$ explosion}
+  \begin{itemize}
+  \item Formula da convertire:
+  \end{itemize}
+  \begin{center}
+    \begin{tikzpicture}
+      \node(f0) at (4,2) [oval, label={[label distance=-1mm]110:$f_0$}] {$\forall\ctlUntil$};
+      \node(f1) at (3,0) [oval, label={[label distance=-1mm]110:$f_1$}] {$\Phi_o$};
+      \node(f2) at (5,0) [oval, label={[label distance=-1mm]80:$f_2$}] {$\Psi_o$};
+      \draw[arrow] (f0) to (f1);
+      \draw[arrow] (f0) to (f2);
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \begin{center}
+    \begin{tikzpicture}[scale=1.3]
+      \node(f0) at (2,5) [oval, label={[label distance=-1mm]110:$f_0$}] {$\land$};
+      \node(f1) at (1,4) [oval, label={[label distance=-1mm]110:$f_1$}] {$\neg$};
+      \node(f2) at (3,4) [oval, label={[label distance=-1mm]80:$f_2$}] {$\neg$};
+      \node(f3) at (1,3) [oval, label={[label distance=-1mm]110:$f_3$}] {$\exists\ctlUntil$};
+      \node(f4) at (3,3) [oval, label={[label distance=-1mm]80:$f_4$}] {$\exists\ctlAlways$};
+      \node(f5) at (0,2) [oval, label={[label distance=-1mm]110:$f_5$}] {$\neg$};
+      \node(f6) at (2,2) [oval, label={[label distance=-1mm]80:$f_6$}] {$\land$};
+      \node(f7) at (3,2) [oval, label={[label distance=-1mm]80:$f_7$}] {$\neg$};
+      \node(f8) at (0,0) [oval, label={[label distance=-1mm]110:$f_8$}] {$\Psi_c'$};
+      \node(f9) at (1,1) [oval, label={[label distance=-1mm]110:$f_9$}] {$\neg$};
+      \node(f10) at (2,1) [oval, label={[label distance=-1mm]80:$f_{10}$}] {$\neg$};
+      \node(f11) at (1,0) [oval, label={[label distance=-1mm]110:$f_{11}$}] {$\Phi_c$};
+      \node(f12) at (2,0) [oval, label={[label distance=-1mm]80:$f_{12}$}] {$\Psi_c''$};
+      \node(f13) at (3,0) [oval, label={[label distance=-1mm]80:$f_{13}$}] {$\Psi_c'''$};      
+      
+      \draw[arrow] (f0) to (f1);
+      \draw[arrow] (f0) to (f2);
+      \draw[arrow] (f1) to (f3);
+      \draw[arrow] (f2) to (f4);
+      \draw[arrow] (f3) to (f5);
+      \draw[arrow] (f3) to (f6);
+      \draw[arrow] (f4) to (f7);
+      \draw[arrow] (f5) to (f8);
+      \draw[arrow] (f6) to (f9);
+      \draw[arrow] (f6) to (f10);
+      \draw[arrow] (f7) to (f13);
+      \draw[arrow] (f9) to (f11);
+      \draw[arrow] (f10) to (f12);
+    \end{tikzpicture}
+  \end{center}
+  \begin{itemize}
+  \item $Sat(\Psi)$ da calcolare \alert{tre} volte
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \begin{center}
+    \begin{tikzpicture}[scale=1.3]
+      \node(f0) at (2,5) [oval, label={[label distance=-1mm]110:$f_0$}] {$\land$};
+      \node(f1) at (1,4) [oval, label={[label distance=-1mm]110:$f_1$}] {$\neg$};
+      \node(f2) at (3,4) [oval, label={[label distance=-1mm]80:$f_2$}] {$\neg$};
+      \node(f3) at (1,3) [oval, label={[label distance=-1mm]110:$f_3$}] {$\exists\ctlUntil$};
+      \node(f4) at (3,3) [oval, label={[label distance=-1mm]80:$f_4$}] {$\exists\ctlAlways$};
+      \node(f5) at (0,2) [oval, label={[label distance=-1mm]110:$f_5$}] {$\neg$};
+      \node(f6) at (2,2) [oval, label={[label distance=-1mm]80:$f_6$}] {$\land$};
+      \node(f7) at (3,2) [oval, label={[label distance=-1mm]80:$f_7$}] {$\neg$};
+      \node(f8) at (1,1) [oval, label={[label distance=-1mm]110:$f_8$}] {$\neg$};
+      \node(f9) at (2,1) [oval, label={[label distance=-1mm]80:$f_9$}] {$\neg$};
+      \node(f10) at (1,0) [oval, label={[label distance=-1mm]110:$f_{10}$}] {$\Phi_c$};
+      \node(f11) at (3,0) [oval, label={[label distance=-1mm]80:$f_{11}$}] {$\Psi_c$};      
+      
+      \draw[arrow] (f0) to (f1);
+      \draw[arrow] (f0) to (f2);
+      \draw[arrow] (f1) to (f3);
+      \draw[arrow] (f2) to (f4);
+      \draw[arrow] (f3) to (f5);
+      \draw[arrow] (f3) to (f6);
+      \draw[arrow] (f4) to (f7);
+      \draw[arrow] plot[smooth] coordinates{(f5.south) (0.5,-0.5) (f11.west)};
+      \draw[arrow] (f6) to (f8);
+      \draw[arrow] (f6) to (f9);
+      \draw[arrow] (f7) to (f11);
+      \draw[arrow] (f8) to (f10);
+      \draw[arrow] (f9) to (f11);
+    \end{tikzpicture}
+  \end{center}
+  \rule{0mm}{0mm}\\[-9mm]
+  \begin{itemize}
+  \item $Sat(\Psi)$ calcolata \alert{una} volta
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \begin{center}
+	\textbf{\calligra\Huge The End.}\\
+  \includegraphics[width=5cm]{img/ornament.eps}\\[1cm]
+	{\huge\calligra Questions? Thank you!}
+  \end{center}
+\end{frame}
+
+\appendix
+
+\begin{frame}[fragile]
+  \frametitle{Implementazione costruttore}
+  %__init__
+  \pfilePart{10}{39}{../ctlChecker.py}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementazione $Sat(\cdot)$}
+  %sat
+  \pfilePart{200}{206}{../ctlChecker.py}  
+  %_sat
+  \pfilePart{191}{198}{../ctlChecker.py}  
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementazione $Sat(\cdot)$}
+  %_satTrue
+  \pfilePart{41}{46}{../ctlChecker.py}  
+  %_satAp
+  \pfilePart{48}{58}{../ctlChecker.py}  
+  %_satAnd
+  \pfilePart{60}{68}{../ctlChecker.py}  
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementazione $Sat(\cdot)$}
+  %_satNot
+  \pfilePart{70}{75}{../ctlChecker.py}  
+  %_satExNext
+  \pfilePart{77}{89}{../ctlChecker.py}  
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementazione $Sat(\cdot)$}
+  %_satExUntil
+  \pfilePart{91}{112}{../ctlChecker.py}  
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementazione $Sat(\cdot)$}
+  %_satExAlways
+  \pfilePart{115}{139}{../ctlChecker.py}  
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementazione $Sat(\cdot)$ formule non \acs{ENF}}
+  %_satConversionOneSon
+  \pfilePart{141}{152}{../ctlChecker.py}
+  \rule{0mm}{0mm}\\[-5mm]
+  %_satConversionTwoSons
+  \pfilePart{154}{167}{../ctlChecker.py}  
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementazione $Sat(\cdot)$ formule non \acs{ENF}}
+  %_satConversionTwoSonsOrdered
+  \pfilePart{169}{182}{../ctlChecker.py}  
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementazione $TS\models\Phi$}
+  %check
+  \pfilePart{208}{216}{../ctlChecker.py}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Complessit\`a rispetto a \acf{LTL}}
+  \begin{itemize}
+  \item[1.] \ac{HP} \`e \alert{NP-Completo}
+    \begin{itemize}
+    \item Trovare un percorso in un certo grafo $G$ che passa
+      esattamente una volta per ogni nodo
+    \end{itemize}
+  \item[2a.] \`e possibile descrivere $TS_G$ e una formula
+    \alert{\acs{LTL}} $\Phi_{LTL}$ di
+    lunghezza \alert{polinomiale} nel numero di stati del grafo del problema
+    \begin{itemize}
+    \item  tali che
+      $TS_G\not\models\Phi_{LTL}\quad\Leftrightarrow\quad G$
+      contiene un percorso hamiltoniano
+    \end{itemize}
+  \item[2b.] il model checking di \ac{LTL} ha complessit\`a \alert{esponenziale} in $|\Phi|$
+  \item[3a.] \`e possibile descrivere un $TS_G$ e una formula
+    \alert{\ac{CTL}} $\Phi_{CTL}$ di lunghezza \alert{esponenziale} nel numero di
+    stati del grafo
+    \begin{itemize}
+    \item  tali che
+      $TS_G\not\models\neg\Phi_{CTL}\quad\Leftrightarrow\quad G$
+      contiene un percorso hamiltoniano
+    \end{itemize}
+  \item[3b.] il model checking di \ac{CTL} ha complessit\`a \alert{lineare} in $|\Phi|$
+  \item[4.] se $P\neq NP$ \alert{non} esiste una formula $\Phi_{CTL}$ equivalente
+    a $\Phi_{LTL}$ e \alert{non} esponenzialmente pi\`u lunga.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{fragile}
+  \frametitle{Implementazione $TS_G$, $\Phi_{LTL}$, $\Phi_{CTL}$}
+  \begin{center}
+    \begin{tikzpicture}
+      \clip (-1.7,-1.35) rectangle (5.7,1.75);
+
+      \coordinate(i1) at (-1,1.8);
+      \coordinate(i2) at (1.9,1);
+      \coordinate(i3) at (2.1,1);
+      \coordinate(i4) at (5,1.8);
+      \node(s1) at (-1,1) [oval, label={[label distance=-1.8mm]110:$\upsilon_1$}] {$v_1$};
+      \node(s2) at (1,1) [oval, label={[label distance=-1.8mm]110:$\upsilon_2$}] {$v_2$};
+      \node(sb) at (2,-0.5) [oval, label={[label distance=-1.8mm]190:$\beta$}] {$b$};
+      \node(s3) at (3,1) [oval, label={[label distance=-1.8mm]80:$\upsilon_3$}] {$v_3$};
+      \node(s4) at (5,1) [oval, label={[label distance=-1.8mm]80:$\upsilon_4$}] {$v_4$};
+      \draw[arrow] (i1) to (s1);
+      \draw[arrow] (i2) to (s2);
+      \draw[arrow] (i3) to (s3);
+      \draw[arrow] (i4) to (s4);
+      \draw[arrow] (s1) to[bend right] (sb);
+      \draw[arrow] (s1) to (s2);
+      \draw[arrow] (s1) to[bend left] (s3);
+      \draw[arrow] (s2) to (sb);
+      \draw[arrow] (s2) to[bend left] (s4);
+      \draw[arrow] (s3) to (sb);
+      \draw[arrow] (s3) to (s4);
+      \draw[arrow] (s3) to[bend left] (s1);
+      \draw[arrow] (s4) to[bend left] (sb);
+      \draw[arrow] (s4) to[bend left] (s1);
+      \draw[arrow] (sb) to[loop below] (sb);
+    \end{tikzpicture}
+  \end{center}
+    \begin{eqnarray*}
+      \Phi_{LTL}&=&\neg\landatory_{\upsilon\in
+        V}(\ctlEventually\upsilon\land\ctlAlways(\upsilon\rightarrow\ctlNext\ctlAlways\neg\upsilon))\\
+      \Phi_{CTL}&=&\lorratory_{(i_1,\dots,i_n)}\Psi(\upsilon_{i_1},\dots,\upsilon_{i_n})\quad\alert{\in\bigO(n!)}
+    \end{eqnarray*}
+    dove $n$ \`e il numero di stati, e $\Psi(\upsilon_i)=\upsilon_i;\quad\Psi(\upsilon_{i_1},\upsilon_{i_2},\dots,\upsilon_{i_n})=\upsilon_{i_1}\land\exists\ctlNext\Psi(\upsilon_{i_2},\dots,\upsilon_{i_n})$.
+\end{frame}
+
+\end{document}
