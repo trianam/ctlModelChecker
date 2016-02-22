@@ -18,22 +18,21 @@
       \fi%     
     \end{beamercolorbox}%
     \vskip1em\par
-    \begin{beamercolorbox}[sep=8pt,center,#1]{author}
+    \begin{beamercolorbox}[sep=1pt,center,#1]{author}
       \usebeamerfont{author}\insertauthor
     \end{beamercolorbox}
-    \begin{beamercolorbox}[sep=8pt,center,#1]{institute}
-      \usebeamerfont{institute}\insertinstitute
+    \begin{beamercolorbox}[sep=1pt,center,#1]{institute}
+%      \usebeamerfont{institute}\insertinstitute
+      \includegraphics[width=5cm]{img/logoUnifiName.eps}
     \end{beamercolorbox}
-    \begin{beamercolorbox}[sep=8pt,center,#1]{date}
-      \usebeamerfont{date}\insertdate
+    \begin{beamercolorbox}[sep=1pt,center,#1]{date}
+      \usebeamerfont{date}\small\flushright\insertdate
     \end{beamercolorbox}\vskip0.5em
     {\usebeamercolor[fg]{titlegraphic}\inserttitlegraphic\par}
+    {
+      \tiny
+      \vfill
+      \href{http://creativecommons.org/licenses/by-sa/4.0/}{\includegraphics[width=1cm]{img/logoCC.png}} This work is licensed under a \href{http://creativecommons.org/licenses/by-sa/4.0/}{Creative Commons Attribution-ShareAlike 4.0 International License}.
+    }
   \endgroup
-  \vspace{-0.5cm}
-  \tiny
-  \vfill
-  \href{http://creativecommons.org/licenses/by-sa/4.0/}{\includegraphics[width=1cm]{img/logoCC.png}}
-  This work is licensed under a
-  \href{http://creativecommons.org/licenses/by-sa/4.0/}{Creative
-    Commons Attribution-ShareAlike 4.0 International License}.
 }
